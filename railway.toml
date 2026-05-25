@@ -1,10 +1,11 @@
+# Configurações compartilhadas por todos os serviços do FarmaGest.
+# Build/Start commands específicos são configurados no painel do Railway
+# por serviço (farmagest-api, farmagest-web).
+# Veja docs/deploy.md para os comandos exatos por serviço.
+
 [build]
 builder = "RAILPACK"
-buildCommand = "pnpm --filter @farmagest/shared build && pnpm --filter @farmagest/api exec prisma generate && pnpm --filter @farmagest/api build"
 
 [deploy]
-startCommand = "pnpm --filter @farmagest/api start:prod"
-preDeployCommand = "pnpm --filter @farmagest/api exec prisma migrate deploy"
-healthcheckPath = "/api/v1/health"
 healthcheckTimeout = 60
 restartPolicyType = "ON_FAILURE"
