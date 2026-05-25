@@ -1,0 +1,11 @@
+# Configurações compartilhadas por todos os serviços do FarmaGest.
+# Build/Start commands específicos são configurados no painel do Railway
+# por serviço (farmagest-api, farmagest-web).
+# Veja docs/deploy.md para os comandos exatos por serviço.
+
+[build]
+builder = "RAILPACK"
+
+[deploy]
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"

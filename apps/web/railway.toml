@@ -1,5 +1,7 @@
 [build]
-builder = "nixpacks"
+builder = "RAILPACK"
+buildCommand = "pnpm --filter @farmagest/shared build && pnpm --filter @farmagest/web build"
 
 [deploy]
-restartPolicyType = "on_failure"
+startCommand = "pnpm --filter @farmagest/web start"
+restartPolicyType = "ON_FAILURE"
