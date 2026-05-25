@@ -1,6 +1,6 @@
 [build]
 builder = "RAILPACK"
-buildCommand = "pnpm --filter @farmagest/shared build && pnpm --filter @farmagest/api build"
+buildCommand = "pnpm --filter @farmagest/shared build && pnpm --filter @farmagest/api exec prisma generate && pnpm --filter @farmagest/api build"
 
 [deploy]
 startCommand = "pnpm --filter @farmagest/api start:prod"
