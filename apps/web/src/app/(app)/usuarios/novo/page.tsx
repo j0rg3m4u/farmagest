@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { createUserSchema, USER_ROLE_LABELS, UserRole, type CreateUserInput } from '@farmagest/shared';
 import { useCreateUser } from '@/hooks/use-users';
 import { useUnits } from '@/hooks/use-units';
+import { useSectors } from '@/hooks/use-sectors';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +24,7 @@ export default function NovoUsuarioPage() {
   const router = useRouter();
   const createUser = useCreateUser();
   const { data: unitsData } = useUnits({ active: 'true', limit: 100 });
+  const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 
   const {
     register,
@@ -47,6 +49,9 @@ export default function NovoUsuarioPage() {
   }
 
   const needsUnit = selectedRole === UserRole.UNIT;
+  const needsSector = [UserRole.COORDINATION, UserRole.ADMIN, UserRole.ASSISTANT].includes(
+    selectedRole as UserRole,
+  );
 
   return (
     <div className="p-6 max-w-2xl">
@@ -95,10 +100,27 @@ export default function NovoUsuarioPage() {
           {errors.role && <p className="text-xs text-red-600">{errors.role.message}</p>}
         </div>
 
+        {needsSector && (
+          <div className="space-y-1.5">
+            <Label>Setor</Label>
+            <Select onValueChange={(v) => setValue('sectorId', (v as string) || null)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o setor" />
+              </SelectTrigger>
+              <SelectContent>
+                {sectorsData?.data.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.sectorId && <p className="text-xs text-red-600">{errors.sectorId.message}</p>}
+          </div>
+        )}
+
         {needsUnit && (
           <div className="space-y-1.5">
             <Label>Unidade</Label>
-            <Select onValueChange={(v) => setValue('unitId', (v as string) || undefined)}>
+            <Select onValueChange={(v) => setValue('unitId', (v as string) || null)}>
               <SelectTrigger>
                 <SelectValue placeholder="Selecione a unidade" />
               </SelectTrigger>

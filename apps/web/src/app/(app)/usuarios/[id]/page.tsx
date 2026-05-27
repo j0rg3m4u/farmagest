@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { updateUserSchema, USER_ROLE_LABELS, UserRole, type UpdateUserInput } from '@farmagest/shared';
 import { useUser, useUpdateUser } from '@/hooks/use-users';
 import { useUnits } from '@/hooks/use-units';
+import { useSectors } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
@@ -31,6 +32,7 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
   const { data: profile, isLoading } = useUser(id);
   const updateUser = useUpdateUser(id);
   const { data: unitsData } = useUnits({ active: 'true', limit: 100 });
+  const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 
   const {
     register,
@@ -45,6 +47,7 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
           email: profile.email,
           role: profile.role as UserRole,
           unitId: profile.unitId ?? undefined,
+          sectorId: profile.sectorId ?? undefined,
           active: profile.active,
         }
       : undefined,
@@ -117,10 +120,28 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
             </div>
 
             <div className="space-y-1.5">
+              <Label>Setor <span className="text-slate-400 text-xs">(opcional)</span></Label>
+              <Select
+                defaultValue={profile.sectorId ?? ''}
+                onValueChange={(v) => setValue('sectorId', v || null)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sem setor" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Sem setor</SelectItem>
+                  {sectorsData?.data.map((s) => (
+                    <SelectItem key={s.id} value={s.id}>{s.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
               <Label>Unidade <span className="text-slate-400 text-xs">(opcional)</span></Label>
               <Select
                 defaultValue={profile.unitId ?? ''}
-                onValueChange={(v) => setValue('unitId', v || undefined)}
+                onValueChange={(v) => setValue('unitId', v || null)}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Sem unidade" />

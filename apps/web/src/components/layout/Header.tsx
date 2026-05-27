@@ -41,7 +41,14 @@ export function Header() {
   return (
     <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0">
       <div className="text-sm text-slate-500">
-        {/* Breadcrumb virá aqui nas próximas sprints */}
+        {user?.sector && (
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-pmdc-gold inline-block" />
+            <span className="font-medium text-slate-700">{user.sector.name}</span>
+            <span className="text-slate-400">·</span>
+            <span className="font-mono text-xs text-slate-400">{user.sector.code}</span>
+          </span>
+        )}
       </div>
 
       <DropdownMenu>
