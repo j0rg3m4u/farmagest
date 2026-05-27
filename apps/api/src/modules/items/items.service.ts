@@ -260,7 +260,7 @@ export class ItemsService {
       const ctrl344Raw = String(row['controlado_344'] ?? 'NAO').trim().toUpperCase();
 
       if (!desc) { errors.push(`Linha ${rowNum}: descrição obrigatória`); continue; }
-      if (desc.length > 200) { errors.push(`Linha ${rowNum}: descrição excede 200 caracteres`); continue; }
+      if (desc.length > 300) { errors.push(`Linha ${rowNum}: descrição excede 300 caracteres`); continue; }
       if (!VALID_CATEGORIES.includes(cat)) { errors.push(`Linha ${rowNum}: categoria inválida "${row['categoria']}" (use MEDICATION ou CORRELATE)`); continue; }
       if (!unit) { errors.push(`Linha ${rowNum}: unidade obrigatória`); continue; }
 

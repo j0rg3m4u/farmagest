@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { ItemCategory } from '../enums';
 
 export const createItemSchema = z.object({
-  description: z.string().min(2, 'Descrição obrigatória').max(200),
+  description: z.string().min(2, 'Descrição obrigatória').max(300),
   category: z.nativeEnum(ItemCategory, { errorMap: () => ({ message: 'Categoria inválida' }) }),
   unitOfMeasure: z.string().min(1, 'Unidade de medida obrigatória').max(30),
   manufacturer: z.string().max(120).nullable().optional(),

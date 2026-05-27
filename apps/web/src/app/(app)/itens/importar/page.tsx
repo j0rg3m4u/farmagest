@@ -100,7 +100,7 @@ function validateListRow(row: Record<string, unknown>, num: number): ListPreview
   const controlado_344 = String(row['controlado_344'] ?? 'NAO').trim().toUpperCase();
   let error: string | undefined;
   if (!descricao) error = 'Descrição obrigatória';
-  else if (descricao.length > 200) error = 'Descrição excede 200 caracteres';
+  else if (descricao.length > 300) error = 'Descrição excede 300 caracteres';
   else if (!VALID_CATEGORIES.includes(categoria)) error = `Categoria inválida: "${row['categoria']}"`;
   else if (!unidade) error = 'Unidade obrigatória';
   return { linha: num, descricao, categoria, unidade, fabricante, controlado_344, error, selected: !error };
