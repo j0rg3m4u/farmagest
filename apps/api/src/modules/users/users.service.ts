@@ -4,6 +4,7 @@ import {
   ConflictException,
   ForbiddenException,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../../common/prisma/prisma.service';
@@ -82,13 +83,26 @@ export class UsersService {
   }
 
   async update(id: string, dto: UpdateUserInput, requesterId: string, requesterRole: UserRole) {
-    await this.findOne(id);
+    const existing = await this.findOne(id);
 
     if (requesterId === id && dto.role && requesterRole === UserRole.COORDINATION) {
       const roleOrder = [UserRole.COORDINATION, UserRole.MANAGER, UserRole.ADMIN, UserRole.ASSISTANT, UserRole.UNIT];
       if (roleOrder.indexOf(dto.role as UserRole) > roleOrder.indexOf(requesterRole)) {
         throw new ForbiddenException('Não é possível rebaixar o próprio perfil');
       }
+    }
+
+    const finalRole = (dto.role ?? existing.role) as UserRole;
+    const finalSectorId = dto.sectorId !== undefined ? dto.sectorId : existing.sectorId;
+
+    const requiresSector = [UserRole.COORDINATION, UserRole.ADMIN, UserRole.ASSISTANT].includes(finalRole);
+    if (requiresSector && !finalSectorId) {
+      throw new BadRequestException(`Perfil ${finalRole} exige vinculação a um setor`);
+    }
+
+    const cannotHaveSector = [UserRole.MANAGER, UserRole.UNIT].includes(finalRole);
+    if (cannotHaveSector && finalSectorId) {
+      throw new BadRequestException(`Perfil ${finalRole} não deve estar vinculado a setor`);
     }
 
     return this.prisma.user.update({ where: { id }, data: dto, select: USER_SELECT });

@@ -53,13 +53,13 @@ export class UsersController {
   }
 
   @Post()
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   create(@Body(new ZodValidationPipe(createUserSchema)) dto: CreateUserInput) {
     return this.users.create(dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateUserSchema)) dto: UpdateUserInput,
@@ -69,7 +69,7 @@ export class UsersController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string, @CurrentUser() user: JwtPayload) {
     return this.users.remove(id, user.sub);

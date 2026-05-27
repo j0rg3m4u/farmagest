@@ -33,7 +33,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UsuariosPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isCoord = user?.role === UserRole.COORDINATION;
+  const canManageUsers = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
 
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
@@ -63,7 +63,7 @@ export default function UsuariosPage() {
         title="Usuários"
         description={`${data?.total ?? 0} usuários cadastrados`}
         action={
-          isCoord && (
+          canManageUsers && (
             <Link href="/usuarios/novo">
               <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
                 <Plus size={16} /> Novo Usuário
@@ -104,7 +104,7 @@ export default function UsuariosPage() {
               <TableHead>Perfil</TableHead>
               <TableHead>Unidade</TableHead>
               <TableHead>Status</TableHead>
-              {isCoord && <TableHead className="w-20" />}
+              {canManageUsers && <TableHead className="w-20" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,7 +141,7 @@ export default function UsuariosPage() {
                     {u.active ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </TableCell>
-                {isCoord && (
+                {canManageUsers && (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-1">
                       <Button
