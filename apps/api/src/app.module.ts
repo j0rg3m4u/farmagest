@@ -8,6 +8,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { UnitsModule } from './modules/units/units.module';
 import { SectorsModule } from './modules/sectors/sectors.module';
+import { ItemsModule } from './modules/items/items.module';
+import { LotsModule } from './modules/lots/lots.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { SectorsModule } from './modules/sectors/sectors.module';
     UsersModule,
     UnitsModule,
     SectorsModule,
+    ItemsModule,
+    LotsModule,
   ],
   providers: [
     {
