@@ -73,6 +73,15 @@ export class ItemsController {
     return this.items.remove(id, user);
   }
 
+  @Patch('batch')
+  @Roles(UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER)
+  batchUpdate(
+    @Body() body: { updates: Array<{ id: string } & Record<string, unknown>> },
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return this.items.batchUpdate(body.updates ?? [], user);
+  }
+
   @Get('import/template')
   getTemplate(@Res() res: Response) {
     const buffer = this.items.buildTemplate();
@@ -85,14 +94,27 @@ export class ItemsController {
 
   @Post('import')
   @Roles(UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER)
-  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 5 * 1024 * 1024 } }))
+  @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))
   import(
     @UploadedFile() file: Express.Multer.File,
     @Body('sectorId') sectorId: string,
+    @Body('mode') mode: string,
+    @Body('onDuplicate') onDuplicate: string,
+    @Body('descriptionColumn') descriptionColumn: string,
+    @Body('typeColumn') typeColumn: string,
+    @Body('startRow') startRow: string,
     @CurrentUser() user: JwtPayload,
   ) {
     if (!file) throw new BadRequestException('Arquivo obrigatório');
     if (!sectorId) throw new BadRequestException('sectorId obrigatório');
-    return this.items.importFromFile(file.buffer, sectorId, user);
+    const resolvedMode = mode === 'matrix' ? 'matrix' : 'list';
+    const resolvedOnDuplicate = (['skip', 'fail', 'update'] as const).includes(onDuplicate as any)
+      ? (onDuplicate as 'skip' | 'fail' | 'update')
+      : 'skip';
+    return this.items.importFromFile(file.buffer, sectorId, user, resolvedMode, {
+      descriptionColumn: descriptionColumn ? parseInt(descriptionColumn, 10) : undefined,
+      typeColumn: typeColumn ? parseInt(typeColumn, 10) : undefined,
+      startRow: startRow ? parseInt(startRow, 10) : undefined,
+    }, resolvedOnDuplicate);
   }
 }

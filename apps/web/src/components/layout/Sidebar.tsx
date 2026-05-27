@@ -3,13 +3,14 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserRole } from '@farmagest/shared';
 import { useAuthStore } from '@/stores/auth-store';
-import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload, PencilLine } from 'lucide-react';
 
 interface NavItem {
   href: string;
   label: string;
   icon: React.ElementType;
   roles: UserRole[];
+  exact?: boolean;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -23,7 +24,14 @@ const NAV_ITEMS: NavItem[] = [
     href: '/unidades',
     label: 'Unidades',
     icon: Building2,
+    exact: true,
     roles: [UserRole.COORDINATION, UserRole.MANAGER, UserRole.ADMIN],
+  },
+  {
+    href: '/unidades/importar',
+    label: 'Importar Unidades',
+    icon: Upload,
+    roles: [UserRole.COORDINATION, UserRole.MANAGER],
   },
   {
     href: '/usuarios',
@@ -41,12 +49,19 @@ const NAV_ITEMS: NavItem[] = [
     href: '/itens',
     label: 'Itens',
     icon: Package,
+    exact: true,
     roles: [UserRole.COORDINATION, UserRole.MANAGER, UserRole.ADMIN, UserRole.ASSISTANT],
   },
   {
     href: '/itens/importar',
     label: 'Importar Itens',
     icon: Upload,
+    roles: [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER],
+  },
+  {
+    href: '/itens/editar-em-lote',
+    label: 'Editar em Lote',
+    icon: PencilLine,
     roles: [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER],
   },
   {
@@ -84,7 +99,9 @@ export function Sidebar() {
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         {visible.map((item) => {
           const Icon = item.icon;
-          const active = pathname.startsWith(item.href);
+          const active = item.exact
+            ? pathname === item.href
+            : pathname === item.href || pathname.startsWith(item.href + '/');
           return (
             <Link
               key={item.href}
