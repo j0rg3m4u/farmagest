@@ -7,6 +7,7 @@ import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { UnitsModule } from './modules/units/units.module';
+import { SectorsModule } from './modules/sectors/sectors.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { UnitsModule } from './modules/units/units.module';
     AuthModule,
     UsersModule,
     UnitsModule,
+    SectorsModule,
   ],
   providers: [
     {

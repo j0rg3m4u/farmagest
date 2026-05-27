@@ -26,6 +26,7 @@ const USER_SELECT = {
 export interface UsersFilter {
   role?: string;
   unitId?: string;
+  sectorId?: string;
   active?: string;
   search?: string;
   page?: string;
@@ -44,6 +45,7 @@ export class UsersService {
     const where: Record<string, unknown> = { deletedAt: null };
     if (filter.role) where.role = filter.role;
     if (filter.unitId) where.unitId = filter.unitId;
+    if (filter.sectorId) where.sectorId = filter.sectorId;
     if (filter.active !== undefined) where.active = filter.active === 'true';
     if (filter.search) {
       where.OR = [

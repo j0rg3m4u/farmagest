@@ -36,8 +36,12 @@ export class UsersController {
 
   @Get()
   @Roles(UserRole.COORDINATION, UserRole.MANAGER)
-  findAll(@Query() query: Record<string, string>) {
-    return this.users.findAll(query);
+  findAll(@Query() query: Record<string, string>, @CurrentUser() user: JwtPayload) {
+    const filter = { ...query };
+    if (user.role !== UserRole.MANAGER && user.sectorId) {
+      filter.sectorId = user.sectorId;
+    }
+    return this.users.findAll(filter);
   }
 
   @Get(':id')
