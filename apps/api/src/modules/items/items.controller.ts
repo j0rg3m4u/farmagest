@@ -66,7 +66,7 @@ export class ItemsController {
     return this.items.update(id, dto, user);
   }
 
-  @Delete('all')
+  @Post('reset')
   @Roles(UserRole.MANAGER)
   @HttpCode(HttpStatus.OK)
   deleteAll() {
