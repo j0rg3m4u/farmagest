@@ -11,5 +11,5 @@ export const UNIT_TYPE_LABELS: Record<UnitType, string> = {
   [UnitType.UPA]: 'UPA',
   [UnitType.HOSPITAL]: 'Hospital',
   [UnitType.CAPS]: 'CAPS',
-  [UnitType.OTHER]: 'Outro',
+  [UnitType.OTHER]: 'Outra',
 };

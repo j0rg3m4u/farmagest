@@ -32,3 +32,6 @@ Thumbs.db
 coverage/
 .turbo/
 *.tsbuildinfo
+
+# dados reais (não versionar)
+dados/

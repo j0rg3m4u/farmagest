@@ -2,14 +2,17 @@
   "name": "farmagest",
   "version": "0.0.0",
   "private": true,
-  "description": "Sistema de controle de medicamentos e correlatos — Prefeitura Municipal de Duque de Caxias",
+  "description": ".:::: Sistema de controle de medicamentos e correlatos ::::.",
   "scripts": {
     "dev:api": "pnpm --filter @farmagest/api dev",
     "dev:web": "pnpm --filter @farmagest/web dev",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "db:reset": "pnpm --filter @farmagest/api exec prisma migrate reset --force",
+    "db:seed": "pnpm --filter @farmagest/api exec prisma db seed",
+    "db:studio": "pnpm --filter @farmagest/api exec prisma studio"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
