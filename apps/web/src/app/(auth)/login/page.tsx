@@ -52,7 +52,7 @@ export default function LoginPage() {
             </div>
             <h1 className="text-2xl font-bold text-slate-900">FarmaGest</h1>
             <p className="text-xs text-slate-400 mt-1 uppercase tracking-widest">
-              Prefeitura Municipal de Duque de Caxias
+              Sistema de Gestão e controle de Medicamentos e Correlatos
             </p>
           </div>
 
@@ -64,7 +64,7 @@ export default function LoginPage() {
                 id="email"
                 type="email"
                 autoComplete="email"
-                placeholder="usuario@duquedecaxias.rj.gov.br"
+                placeholder="seu@email.com"
                 {...register('email')}
               />
               {errors.email && (
@@ -96,7 +96,7 @@ export default function LoginPage() {
           </form>
 
           <p className="text-center text-xs text-slate-400 mt-6">
-            Acesso restrito a servidores da PMDC
+            Acesso restrito a usuários autorizados
           </p>
         </div>
       </div>

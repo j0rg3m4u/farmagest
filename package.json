@@ -2,7 +2,7 @@
   "name": "farmagest",
   "version": "0.0.0",
   "private": true,
-  "description": "Sistema de controle de medicamentos e correlatos — Prefeitura Municipal de Duque de Caxias",
+  "description": ".:::: Sistema de controle de medicamentos e correlatos ::::.",
   "scripts": {
     "dev:api": "pnpm --filter @farmagest/api dev",
     "dev:web": "pnpm --filter @farmagest/web dev",

@@ -75,7 +75,7 @@ export default function NovoUsuarioPage() {
 
         <div className="space-y-1.5">
           <Label>E-mail institucional</Label>
-          <Input type="email" placeholder="usuario@duquedecaxias.rj.gov.br" {...register('email')} />
+          <Input type="email" placeholder="seu@email.com" {...register('email')} />
           {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
         </div>
 

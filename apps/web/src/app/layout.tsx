@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 export const metadata: Metadata = {
   title: 'FarmaGest',
   description:
-    'Sistema de controle de medicamentos e correlatos — Prefeitura Municipal de Duque de Caxias',
+    'Sistema de Gestão de Medicamentos e Correlatos',
 };
 
 export default function RootLayout({

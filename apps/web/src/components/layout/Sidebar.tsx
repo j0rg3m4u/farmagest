@@ -91,7 +91,7 @@ export function Sidebar() {
       <div className="px-6 py-5 border-b border-pmdc-blue-light">
         <div className="text-pmdc-gold font-bold text-lg leading-tight">FarmaGest</div>
         <div className="text-pmdc-blue-soft text-xs mt-0.5 opacity-80">
-          Prefeitura de Duque de Caxias
+          Gestão de Medicamentos e Correlatos
         </div>
       </div>
 
