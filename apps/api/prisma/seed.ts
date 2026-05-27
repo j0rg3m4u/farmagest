@@ -311,6 +311,24 @@ async function main() {
   });
 
   console.log('✓ 3 lotes criados');
+
+  // ============ VALIDAÇÃO DE CONSISTÊNCIA ============
+  const inconsistent = await prisma.user.findMany({
+    where: {
+      deletedAt: null,
+      OR: [
+        { role: { in: ['COORDINATION', 'ADMIN', 'ASSISTANT'] }, sectorId: null },
+        { role: { in: ['MANAGER', 'UNIT'] }, sectorId: { not: null } },
+      ],
+    },
+    select: { email: true, role: true, sectorId: true },
+  });
+
+  if (inconsistent.length > 0) {
+    console.error('❌ Seed produziu usuários inconsistentes:', inconsistent);
+    process.exit(1);
+  }
+
   console.log('');
   console.log('═══════════════════════════════════════════════════════');
   console.log('Logins disponíveis (senha: FarmaGest@2026):');
@@ -321,6 +339,7 @@ async function main() {
   console.log('  carlos.aux@...        → ASSISTANT / Medicamentos');
   console.log('  joana.aux@...         → ASSISTANT / Correlatos');
   console.log('═══════════════════════════════════════════════════════');
+  console.log('✓ Seed concluído com estado consistente');
 }
 
 main()

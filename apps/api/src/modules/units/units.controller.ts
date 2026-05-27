@@ -45,13 +45,13 @@ export class UnitsController {
   }
 
   @Post()
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   create(@Body(new ZodValidationPipe(createUnitSchema)) dto: CreateUnitInput) {
     return this.units.create(dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateUnitSchema)) dto: UpdateUnitInput,
@@ -60,7 +60,7 @@ export class UnitsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.COORDINATION)
+  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.units.remove(id);
