@@ -84,3 +84,14 @@ export function useBatchUpdateItems() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['items'] }),
   });
 }
+
+export function useResetItems() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.post<{ deleted: number }>('/items/reset');
+      return res.data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['items'] }),
+  });
+}

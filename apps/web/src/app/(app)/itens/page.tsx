@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useItems, useDeleteItem } from '@/hooks/use-items';
+import { useItems, useDeleteItem, useResetItems } from '@/hooks/use-items';
 import { useAuthStore } from '@/stores/auth-store';
 import { ITEM_CATEGORY_LABELS, ItemCategory, UserRole } from '@farmagest/shared';
 import { PageHeader } from '@/components/shared/PageHeader';
@@ -27,7 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Plus, Pencil, Trash2, AlertTriangle } from 'lucide-react';
+import { Plus, Pencil, Trash2, AlertTriangle, Eraser } from 'lucide-react';
 
 export default function ItensPage() {
   const router = useRouter();
@@ -42,6 +42,7 @@ export default function ItensPage() {
   const [category, setCategory] = useState('');
   const [controlled344, setControlled344] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
 
   const { data, isLoading } = useItems({
     search: search || undefined,
@@ -49,6 +50,18 @@ export default function ItensPage() {
     controlled344: controlled344 || undefined,
   });
   const deleteItem = useDeleteItem();
+  const resetItems = useResetItems();
+
+  async function handleReset() {
+    try {
+      const res = await resetItems.mutateAsync();
+      toast.success(`${res.deleted} itens removidos com sucesso`);
+    } catch (err: any) {
+      toast.error(err.response?.data?.message ?? 'Erro ao limpar itens');
+    } finally {
+      setConfirmReset(false);
+    }
+  }
 
   async function handleDelete() {
     if (!deleteId) return;
@@ -68,13 +81,25 @@ export default function ItensPage() {
         title="Itens"
         description={`${data?.total ?? 0} itens cadastrados`}
         action={
-          canCreate && (
-            <Link href="/itens/novo">
-              <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
-                <Plus size={16} /> Novo Item
+          <div className="flex gap-2">
+            {isManager && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="border-red-300 text-red-600 hover:bg-red-50 gap-1.5"
+                onClick={() => setConfirmReset(true)}
+              >
+                <Eraser size={16} /> Limpar todos
               </Button>
-            </Link>
-          )
+            )}
+            {canCreate && (
+              <Link href="/itens/novo">
+                <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
+                  <Plus size={16} /> Novo Item
+                </Button>
+              </Link>
+            )}
+          </div>
         }
       />
 
@@ -219,6 +244,16 @@ export default function ItensPage() {
         description="O item será marcado como inativo. Esta ação não exclui os lotes associados."
         confirmLabel="Desativar"
         loading={deleteItem.isPending}
+      />
+
+      <ConfirmDialog
+        open={confirmReset}
+        onClose={() => setConfirmReset(false)}
+        onConfirm={handleReset}
+        title="Limpar todos os itens"
+        description="Todos os itens serão removidos permanentemente e as sequências dos setores serão zeradas. Esta ação não pode ser desfeita."
+        confirmLabel="Limpar tudo"
+        loading={resetItems.isPending}
       />
     </div>
   );
