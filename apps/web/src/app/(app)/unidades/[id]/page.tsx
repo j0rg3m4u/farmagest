@@ -25,7 +25,7 @@ export default function UnidadePage({ params }: { params: Promise<{ id: string }
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isCoord = user?.role === UserRole.COORDINATION;
+  const canManageUnits = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
 
   const { data: unit, isLoading } = useUnit(id);
   const updateUnit = useUpdateUnit(id);
@@ -78,7 +78,7 @@ export default function UnidadePage({ params }: { params: Promise<{ id: string }
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-6 space-y-5">
         <div className="space-y-1.5">
           <Label>Nome</Label>
-          <Input {...register('name')} disabled={!isCoord} />
+          <Input {...register('name')} disabled={!canManageUnits} />
           {errors.name && <p className="text-xs text-red-600">{errors.name.message}</p>}
         </div>
 
@@ -87,7 +87,7 @@ export default function UnidadePage({ params }: { params: Promise<{ id: string }
           <Select
             defaultValue={unit.type}
             onValueChange={(v) => setValue('type', v as UnitType)}
-            disabled={!isCoord}
+            disabled={!canManageUnits}
           >
             <SelectTrigger>
               <SelectValue />
@@ -102,21 +102,21 @@ export default function UnidadePage({ params }: { params: Promise<{ id: string }
 
         <div className="space-y-1.5">
           <Label>Responsável</Label>
-          <Input {...register('responsible')} disabled={!isCoord} />
+          <Input {...register('responsible')} disabled={!canManageUnits} />
           {errors.responsible && <p className="text-xs text-red-600">{errors.responsible.message}</p>}
         </div>
 
         <div className="space-y-1.5">
           <Label>Endereço</Label>
-          <Input {...register('address')} disabled={!isCoord} />
+          <Input {...register('address')} disabled={!canManageUnits} />
         </div>
 
         <div className="space-y-1.5">
           <Label>Contato</Label>
-          <Input {...register('contact')} disabled={!isCoord} />
+          <Input {...register('contact')} disabled={!canManageUnits} />
         </div>
 
-        {isCoord && (
+        {canManageUnits && (
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => router.back()}>
               Cancelar
