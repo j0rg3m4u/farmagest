@@ -11,6 +11,7 @@ export interface JwtPayload {
   email: string;
   role: string;
   unitId: string | null;
+  sectorId: string | null;
   iat?: number;
   exp?: number;
 }

@@ -23,6 +23,23 @@ enum UnitType {
   OTHER
 }
 
+model Sector {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  code        String    @unique
+  responsible String
+  description String?
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  users User[]
+
+  @@index([name])
+  @@index([active])
+}
+
 model User {
   id           String    @id @default(cuid())
   name         String
@@ -31,6 +48,8 @@ model User {
   role         UserRole
   unitId       String?
   unit         Unit?     @relation(fields: [unitId], references: [id])
+  sectorId     String?
+  sector       Sector?   @relation(fields: [sectorId], references: [id])
   active       Boolean   @default(true)
   lastLoginAt  DateTime?
   createdAt    DateTime  @default(now())
@@ -42,6 +61,7 @@ model User {
 
   @@index([email])
   @@index([unitId])
+  @@index([sectorId])
 }
 
 model RefreshToken {
@@ -81,10 +101,12 @@ model AuditLog {
   action    String
   entity    String
   entityId  String?
+  sectorId  String?
   payload   Json
   createdAt DateTime @default(now())
 
   @@index([userId])
   @@index([entity, entityId])
   @@index([createdAt])
+  @@index([sectorId])
 }

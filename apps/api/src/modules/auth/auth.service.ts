@@ -42,6 +42,7 @@ export class AuthService {
       email: user.email,
       role: user.role,
       unitId: user.unitId,
+      sectorId: user.sectorId,
     };
 
     const accessToken = this.jwt.sign(payload, {
@@ -59,6 +60,7 @@ export class AuthService {
         email: user.email,
         role: user.role as any,
         unitId: user.unitId,
+        sectorId: user.sectorId,
         active: user.active,
         lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
         createdAt: user.createdAt.toISOString(),
@@ -86,6 +88,7 @@ export class AuthService {
       email: stored.user.email,
       role: stored.user.role,
       unitId: stored.user.unitId,
+      sectorId: stored.user.sectorId,
     };
 
     const accessToken = this.jwt.sign(payload, {
@@ -111,6 +114,8 @@ export class AuthService {
         email: true,
         role: true,
         unitId: true,
+        sectorId: true,
+        sector: { select: { id: true, name: true, code: true } },
         active: true,
         lastLoginAt: true,
         createdAt: true,

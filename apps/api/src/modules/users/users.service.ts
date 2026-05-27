@@ -15,6 +15,8 @@ const USER_SELECT = {
   email: true,
   role: true,
   unitId: true,
+  sectorId: true,
+  sector: { select: { id: true, name: true, code: true } },
   active: true,
   lastLoginAt: true,
   createdAt: true,
