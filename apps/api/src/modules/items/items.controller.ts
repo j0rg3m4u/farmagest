@@ -92,6 +92,14 @@ export class ItemsController {
     res.send(buffer);
   }
 
+  @Delete('all')
+  @Roles(UserRole.MANAGER)
+  @HttpCode(HttpStatus.OK)
+  deleteAll(@CurrentUser() user: JwtPayload) {
+    if (user.role !== UserRole.MANAGER) throw new BadRequestException('Apenas MANAGER pode executar esta operação');
+    return this.items.deleteAll();
+  }
+
   @Post('import')
   @Roles(UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER)
   @UseInterceptors(FileInterceptor('file', { limits: { fileSize: 10 * 1024 * 1024 } }))

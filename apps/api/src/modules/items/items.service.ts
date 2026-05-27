@@ -173,6 +173,12 @@ export class ItemsService {
     });
   }
 
+  async deleteAll() {
+    const { count } = await this.prisma.item.deleteMany({});
+    await this.prisma.sector.updateMany({ data: { itemSequence: 0 } });
+    return { deleted: count };
+  }
+
   async importFromFile(
     fileBuffer: Buffer,
     sectorId: string,
