@@ -174,6 +174,7 @@ export class ItemsService {
   }
 
   async deleteAll() {
+    await this.prisma.lot.deleteMany({});
     const { count } = await this.prisma.item.deleteMany({});
     await this.prisma.sector.updateMany({ data: { itemSequence: 0 } });
     return { deleted: count };

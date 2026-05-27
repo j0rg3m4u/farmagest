@@ -32,7 +32,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UnidadesPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isCoord = user?.role === UserRole.COORDINATION;
+  const canManageUnits = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
 
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
@@ -59,7 +59,7 @@ export default function UnidadesPage() {
         title="Unidades de Saúde"
         description={`${data?.total ?? 0} unidades cadastradas`}
         action={
-          isCoord && (
+          canManageUnits && (
             <Link href="/unidades/novo">
               <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
                 <Plus size={16} /> Nova Unidade
@@ -100,7 +100,7 @@ export default function UnidadesPage() {
               <TableHead>Responsável</TableHead>
               <TableHead>Contato</TableHead>
               <TableHead>Status</TableHead>
-              {isCoord && <TableHead className="w-20" />}
+              {canManageUnits && <TableHead className="w-20" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,7 +135,7 @@ export default function UnidadesPage() {
                     {unit.active ? 'Ativa' : 'Inativa'}
                   </Badge>
                 </TableCell>
-                {isCoord && (
+                {canManageUnits && (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-1">
                       <Button
