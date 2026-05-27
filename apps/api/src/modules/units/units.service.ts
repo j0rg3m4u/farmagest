@@ -62,7 +62,7 @@ export class UnitsService {
     await this.findOne(id);
 
     const activeUsers = await this.prisma.user.count({
-      where: { unitId: id, active: true },
+      where: { unitId: id, active: true, deletedAt: null },
     });
 
     if (activeUsers > 0) {
