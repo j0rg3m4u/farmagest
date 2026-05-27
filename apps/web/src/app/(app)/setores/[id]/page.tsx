@@ -32,7 +32,6 @@ export default function SetorPage({ params }: { params: Promise<{ id: string }> 
     values: sector
       ? {
           name: sector.name,
-          code: sector.code,
           responsible: sector.responsible,
           description: sector.description ?? undefined,
           active: sector.active,
@@ -74,9 +73,8 @@ export default function SetorPage({ params }: { params: Promise<{ id: string }> 
         </div>
 
         <div className="space-y-1.5">
-          <Label>Código</Label>
-          <Input className="font-mono" {...register('code')} disabled={!canEdit} />
-          {errors.code && <p className="text-xs text-red-600">{errors.code.message}</p>}
+          <Label>Código <span className="text-slate-400 text-xs">(imutável)</span></Label>
+          <Input className="font-mono" value={sector.code} disabled />
         </div>
 
         <div className="space-y-1.5">
