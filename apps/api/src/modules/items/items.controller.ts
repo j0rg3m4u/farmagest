@@ -66,6 +66,13 @@ export class ItemsController {
     return this.items.update(id, dto, user);
   }
 
+  @Delete('all')
+  @Roles(UserRole.MANAGER)
+  @HttpCode(HttpStatus.OK)
+  deleteAll() {
+    return this.items.deleteAll();
+  }
+
   @Delete(':id')
   @Roles(UserRole.COORDINATION, UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -90,14 +97,6 @@ export class ItemsController {
       'Content-Disposition': 'attachment; filename="modelo-importacao-itens.xlsx"',
     });
     res.send(buffer);
-  }
-
-  @Delete('all')
-  @Roles(UserRole.MANAGER)
-  @HttpCode(HttpStatus.OK)
-  deleteAll(@CurrentUser() user: JwtPayload) {
-    if (user.role !== UserRole.MANAGER) throw new BadRequestException('Apenas MANAGER pode executar esta operação');
-    return this.items.deleteAll();
   }
 
   @Post('import')
