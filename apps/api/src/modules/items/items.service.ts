@@ -3,8 +3,11 @@ import {
   NotFoundException,
   ForbiddenException,
   BadRequestException,
+  UnprocessableEntityException,
 } from '@nestjs/common';
+import * as XLSX from 'xlsx';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { ItemCategory } from '@prisma/client';
 import type { CreateItemInput, UpdateItemInput, JwtPayload } from '@farmagest/shared';
 
 const ITEM_SELECT = {
@@ -140,6 +143,93 @@ export class ItemsService {
       where: { id },
       data: { deletedAt: new Date(), active: false },
     });
+  }
+
+  async importFromFile(
+    fileBuffer: Buffer,
+    sectorId: string,
+    user: JwtPayload,
+  ): Promise<{ imported: number; codes: string[] }> {
+    this.validateSectorAccess(sectorId, user);
+
+    const workbook = XLSX.read(fileBuffer, { type: 'buffer' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows: Record<string, unknown>[] = XLSX.utils.sheet_to_json(sheet);
+
+    if (rows.length === 0) throw new BadRequestException('Planilha vazia');
+    if (rows.length > 500) throw new BadRequestException('Máximo de 500 itens por importação');
+
+    const VALID_CATEGORIES = ['MEDICATION', 'CORRELATE'];
+    const errors: string[] = [];
+
+    const parsed: Array<{ description: string; category: ItemCategory; unitOfMeasure: string; manufacturer: string | null; controlled344: boolean }> = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      const rowNum = i + 2; // 1-indexed + header
+      const desc = String(row['descricao'] ?? '').trim();
+      const cat = String(row['categoria'] ?? '').trim().toUpperCase();
+      const unit = String(row['unidade'] ?? '').trim();
+      const manufacturer = row['fabricante'] ? String(row['fabricante']).trim() : null;
+      const ctrl344Raw = String(row['controlado_344'] ?? 'NAO').trim().toUpperCase();
+
+      if (!desc) { errors.push(`Linha ${rowNum}: descrição obrigatória`); continue; }
+      if (desc.length > 200) { errors.push(`Linha ${rowNum}: descrição excede 200 caracteres`); continue; }
+      if (!VALID_CATEGORIES.includes(cat)) { errors.push(`Linha ${rowNum}: categoria inválida "${row['categoria']}" (use MEDICATION ou CORRELATE)`); continue; }
+      if (!unit) { errors.push(`Linha ${rowNum}: unidade obrigatória`); continue; }
+
+      const controlled344 = ['SIM', 'TRUE', '1', 'YES'].includes(ctrl344Raw);
+
+      parsed.push({
+        description: desc,
+        category: cat as ItemCategory,
+        unitOfMeasure: unit,
+        manufacturer: manufacturer || null,
+        controlled344,
+      });
+    }
+
+    if (errors.length > 0) {
+      throw new UnprocessableEntityException({ errors, message: 'Planilha contém erros' });
+    }
+
+    return this.prisma.$transaction(async (tx) => {
+      const sector = await tx.sector.findUnique({
+        where: { id: sectorId },
+        select: { id: true, code: true, itemSequence: true, active: true },
+      });
+      if (!sector) throw new NotFoundException('Setor não encontrado');
+      if (!sector.active) throw new BadRequestException('Setor está inativo');
+
+      const codes: string[] = [];
+      let seq = sector.itemSequence;
+
+      for (const item of parsed) {
+        seq++;
+        const code = `${sector.code}-${String(seq).padStart(4, '0')}`;
+        await tx.item.create({
+          data: { ...item, code, sequence: seq, sectorId },
+        });
+        codes.push(code);
+      }
+
+      await tx.sector.update({ where: { id: sectorId }, data: { itemSequence: seq } });
+
+      return { imported: parsed.length, codes };
+    });
+  }
+
+  buildTemplate(): Buffer {
+    const data = [
+      ['descricao', 'categoria', 'unidade', 'fabricante', 'controlado_344'],
+      ['Dipirona 500mg cp', 'MEDICATION', 'cp', 'EMS', 'NAO'],
+      ['Diazepam 10mg cp', 'MEDICATION', 'cp', 'EMS', 'SIM'],
+      ['Seringa descartável 5ml', 'CORRELATE', 'un', 'BD', 'NAO'],
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Importação');
+    return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' }) as Buffer;
   }
 
   private validateSectorAccess(sectorId: string, user: JwtPayload): void {

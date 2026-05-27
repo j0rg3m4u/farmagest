@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserRole } from '@farmagest/shared';
 import { useAuthStore } from '@/stores/auth-store';
-import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload } from 'lucide-react';
 
 interface NavItem {
   href: string;
@@ -42,6 +42,12 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Itens',
     icon: Package,
     roles: [UserRole.COORDINATION, UserRole.MANAGER, UserRole.ADMIN, UserRole.ASSISTANT],
+  },
+  {
+    href: '/itens/importar',
+    label: 'Importar Itens',
+    icon: Upload,
+    roles: [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER],
   },
   {
     href: '/pedidos',
