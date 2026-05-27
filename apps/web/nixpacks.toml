@@ -1,3 +1,4 @@
+# build: 2026-05-27
 [phases.setup]
 nixPkgs = ["nodejs_20"]
 
