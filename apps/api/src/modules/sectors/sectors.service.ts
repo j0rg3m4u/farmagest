@@ -83,20 +83,12 @@ export class SectorsService {
   async update(id: string, dto: UpdateSectorInput) {
     await this.findOne(id);
 
-    if (dto.name || dto.code) {
+    if (dto.name) {
       const conflict = await this.prisma.sector.findFirst({
-        where: {
-          AND: [
-            { id: { not: id } },
-            { deletedAt: null },
-            { OR: [...(dto.name ? [{ name: dto.name }] : []), ...(dto.code ? [{ code: dto.code }] : [])] },
-          ],
-        },
+        where: { AND: [{ id: { not: id } }, { deletedAt: null }, { name: dto.name }] },
       });
       if (conflict) {
-        throw new ConflictException(
-          conflict.name === dto.name ? 'Nome já cadastrado' : 'Código já cadastrado',
-        );
+        throw new ConflictException('Nome já cadastrado');
       }
     }
 

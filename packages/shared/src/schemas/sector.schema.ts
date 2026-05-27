@@ -11,9 +11,12 @@ export const createSectorSchema = z.object({
   description: z.string().max(500).nullable().optional(),
 });
 
-export const updateSectorSchema = createSectorSchema.partial().extend({
-  active: z.boolean().optional(),
-});
+export const updateSectorSchema = createSectorSchema
+  .omit({ code: true })
+  .partial()
+  .extend({
+    active: z.boolean().optional(),
+  });
 
 export type CreateSectorInput = z.infer<typeof createSectorSchema>;
 export type UpdateSectorInput = z.infer<typeof updateSectorSchema>;
