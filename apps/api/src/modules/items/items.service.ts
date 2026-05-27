@@ -293,7 +293,7 @@ export class ItemsService {
       if (!descCell) continue;
       const desc = String(descCell.v ?? '').trim();
       if (!desc) continue;
-      if (desc.length > 200) { errors.push(`Linha ${r + 1}: descrição excede 200 caracteres`); continue; }
+      if (desc.length > 300) { errors.push(`Linha ${r + 1}: descrição excede 300 caracteres`); continue; }
 
       const typeCell = sheet[XLSX.utils.encode_cell({ r, c: typeColIdx })];
       const rawType = typeCell ? String(typeCell.v ?? '').trim().toUpperCase() : 'MAT';
