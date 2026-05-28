@@ -1,0 +1,34 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateExchangeInputSchema = exports.updateExchangeOutputSchema = exports.addExchangeInputSchema = exports.addExchangeOutputSchema = exports.updateExchangeSchema = exports.createExchangeSchema = void 0;
+const zod_1 = require("zod");
+exports.createExchangeSchema = zod_1.z.object({
+    partnerId: zod_1.z.string().cuid('Município parceiro inválido'),
+    sectorId: zod_1.z.string().cuid('Setor inválido'),
+    date: zod_1.z.string().datetime().optional(),
+    justification: zod_1.z.string().min(10, 'Descreva o motivo da troca (mín. 10 caracteres)').max(500),
+});
+exports.updateExchangeSchema = exports.createExchangeSchema
+    .omit({ sectorId: true })
+    .partial();
+exports.addExchangeOutputSchema = zod_1.z.object({
+    itemId: zod_1.z.string().cuid(),
+    lotId: zod_1.z.string().cuid(),
+    quantity: zod_1.z.number().positive(),
+    unitValue: zod_1.z.number().positive().optional(),
+    notes: zod_1.z.string().max(300).nullable().optional(),
+});
+exports.addExchangeInputSchema = zod_1.z.object({
+    itemId: zod_1.z.string().cuid(),
+    declaredLotNumber: zod_1.z.string().max(50).nullable().optional(),
+    declaredExpiration: zod_1.z.string().datetime().nullable().optional(),
+    quantity: zod_1.z.number().positive(),
+    unitValue: zod_1.z.number().positive('Informe o valor unitário declarado'),
+    notes: zod_1.z.string().max(300).nullable().optional(),
+});
+exports.updateExchangeOutputSchema = exports.addExchangeOutputSchema
+    .omit({ itemId: true, lotId: true })
+    .partial();
+exports.updateExchangeInputSchema = exports.addExchangeInputSchema
+    .omit({ itemId: true })
+    .partial();

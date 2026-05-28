@@ -9,6 +9,7 @@ export interface Lot {
   expirationDate: string;
   initialQuantity: string;
   currentBalance: string;
+  unitCost: string | null;
   supplier: string | null;
   invoiceNumber: string | null;
   notes: string | null;

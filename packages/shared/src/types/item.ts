@@ -8,6 +8,7 @@ export interface Item {
   unitOfMeasure: string;
   manufacturer: string | null;
   controlled344: boolean;
+  unitValue: string | null;
   active: boolean;
   sectorId: string;
   sector?: { id: string; name: string; code: string };

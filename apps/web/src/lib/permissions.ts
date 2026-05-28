@@ -58,6 +58,28 @@ export const canCreateLots: RoleCheck = canManageLots;
 export const canImportItems: RoleCheck = canManageItems;
 export const canImportUnits: RoleCheck = canManageUnits;
 
+// ============ MOVEMENTS ============
+
+export const canCreateMovements: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'ADMIN' || user?.role === 'MANAGER';
+
+export const canManageMovements: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+
+// ============ EXTERNAL PARTNERS ============
+
+export const canManageExternalPartners: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+
+export const canDeleteExternalPartners: RoleCheck = (user) => user?.role === 'MANAGER';
+
+// ============ EXCHANGES ============
+
+export const canManageExchanges: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+
+export const canApproveExchanges: RoleCheck = (user) => user?.role === 'MANAGER';
+
 // ============ HELPERS GLOBAIS ============
 
 /** Usuário vê todos os setores (sem escopo de setor). */

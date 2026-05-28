@@ -10,11 +10,13 @@ import {
   ItemCategory,
   type UpdateItemInput,
 } from '@farmagest/shared';
-import { canEditItems, canCreateLots } from '@/lib/permissions';
+import { canEditItems, canCreateLots, canCreateMovements } from '@/lib/permissions';
 import { useItem, useUpdateItem } from '@/hooks/use-items';
 import { useItemLots } from '@/hooks/use-lots';
+import { useItemMovements } from '@/hooks/use-movements';
 import { useAuthStore } from '@/stores/auth-store';
 import { NewLotDialog } from '@/components/shared/NewLotDialog';
+import { EntryPurchaseDialog } from '@/components/shared/EntryPurchaseDialog';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,7 +37,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ArrowLeft, Plus, AlertTriangle, PackageOpen } from 'lucide-react';
+import { MOVEMENT_TYPE_LABELS } from '@farmagest/shared';
+import { ArrowLeft, Plus, AlertTriangle, PackageOpen, TrendingDown, TrendingUp } from 'lucide-react';
 
 function expirationStatus(dateStr: string) {
   const d = new Date(dateStr);
@@ -52,11 +55,16 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
   const user = useAuthStore((s) => s.user);
   const canEdit = canEditItems(user);
   const canAddLot = canCreateLots(user);
+  const canEntry = canCreateMovements(user);
   const [newLotOpen, setNewLotOpen] = useState(false);
+  const [entryOpen, setEntryOpen] = useState(false);
 
   const { data: item, isLoading } = useItem(id);
   const { data: lotsData } = useItemLots(id);
   const updateItem = useUpdateItem(id);
+
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86400000).toISOString();
+  const { data: movementsData } = useItemMovements(id, { limit: 10 });
 
   const {
     register,
@@ -91,6 +99,13 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
   if (!item) return <div className="p-6 text-slate-400">Item não encontrado</div>;
 
   const activeLots = lotsData?.data.filter((l) => l.active) ?? [];
+  const totalBalance = activeLots.reduce((sum, l) => sum + Number(l.currentBalance), 0);
+
+  const recentExits = movementsData?.data.filter((m) =>
+    m.type === 'EXIT_SUPPLY' && new Date(m.createdAt) >= new Date(Date.now() - 30 * 86400000)
+  ) ?? [];
+  const dailyAvg = recentExits.reduce((s, m) => s + Number(m.quantity), 0) / 30;
+  const daysUntilEmpty = dailyAvg > 0 ? Math.floor(totalBalance / dailyAvg) : null;
 
   return (
     <div className="p-6 max-w-3xl space-y-6">
@@ -127,20 +142,32 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
         <ArrowLeft size={16} /> Voltar
       </Button>
 
-      {/* Dados */}
+      {/* Stats */}
       <div className="grid grid-cols-4 gap-3">
-        {[
-          { label: 'Saldo total', value: '—', note: 'Sprint 3' },
-          { label: 'Consumo médio', value: '—', note: 'Sprint 3' },
-          { label: 'Dias até zerar', value: '—', note: 'Sprint 3' },
-          { label: 'Lotes ativos', value: String(activeLots.length) },
-        ].map((stat) => (
-          <div key={stat.label} className="bg-white rounded-lg border p-4">
-            <div className="text-xs text-slate-400">{stat.label}</div>
-            <div className="text-2xl font-semibold text-slate-700 mt-1">{stat.value}</div>
-            {stat.note && <div className="text-xs text-slate-400 mt-0.5">{stat.note}</div>}
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-xs text-slate-400">Saldo total</div>
+          <div className="text-2xl font-semibold text-slate-700 mt-1">
+            {totalBalance.toLocaleString('pt-BR', { maximumFractionDigits: 3 })}
           </div>
-        ))}
+          <div className="text-xs text-slate-400 mt-0.5">{item.unitOfMeasure}</div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-xs text-slate-400">Consumo médio/dia</div>
+          <div className="text-2xl font-semibold text-slate-700 mt-1">
+            {dailyAvg > 0 ? dailyAvg.toFixed(1) : '—'}
+          </div>
+          <div className="text-xs text-slate-400 mt-0.5">últimos 30 dias</div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-xs text-slate-400">Dias até zerar</div>
+          <div className="text-2xl font-semibold text-slate-700 mt-1">
+            {daysUntilEmpty !== null ? daysUntilEmpty : '∞'}
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border p-4">
+          <div className="text-xs text-slate-400">Lotes ativos</div>
+          <div className="text-2xl font-semibold text-slate-700 mt-1">{activeLots.length}</div>
+        </div>
       </div>
 
       {/* Formulário de edição */}
@@ -226,16 +253,27 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
             Lotes em estoque
             <span className="ml-2 text-slate-400 font-normal">({activeLots.length} ativo{activeLots.length !== 1 ? 's' : ''})</span>
           </h2>
-          {canAddLot && (
-            <Button
-              size="sm"
-              variant="outline"
-              className="gap-1.5 text-pmdc-blue border-pmdc-blue/30 hover:bg-pmdc-blue/5"
-              onClick={() => setNewLotOpen(true)}
-            >
-              <Plus size={14} /> Novo lote
-            </Button>
-          )}
+          <div className="flex gap-2">
+            {canEntry && (
+              <Button
+                size="sm"
+                className="gap-1.5 bg-green-600 hover:bg-green-700 text-white"
+                onClick={() => setEntryOpen(true)}
+              >
+                <TrendingUp size={14} /> Nova entrada
+              </Button>
+            )}
+            {canAddLot && (
+              <Button
+                size="sm"
+                variant="outline"
+                className="gap-1.5 text-pmdc-blue border-pmdc-blue/30 hover:bg-pmdc-blue/5"
+                onClick={() => setNewLotOpen(true)}
+              >
+                <Plus size={14} /> Novo lote
+              </Button>
+            )}
+          </div>
         </div>
 
         {lotsData?.data.length === 0 ? (
@@ -286,15 +324,72 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
         )}
       </div>
 
-      {/* Movimentações — placeholder Sprint 3 */}
-      <div className="bg-white rounded-lg border p-6 text-center text-slate-400">
-        <p className="text-sm">Últimas movimentações disponíveis a partir da Sprint 3</p>
+      {/* Últimas movimentações */}
+      <div className="bg-white rounded-lg border overflow-hidden">
+        <div className="px-6 py-4 border-b">
+          <h2 className="text-sm font-semibold text-slate-700">Últimas movimentações</h2>
+        </div>
+        {!movementsData?.data.length ? (
+          <div className="p-6 text-center text-sm text-slate-400">Nenhuma movimentação registrada</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-50">
+                <TableHead>Data</TableHead>
+                <TableHead>Tipo</TableHead>
+                <TableHead>Lote</TableHead>
+                <TableHead className="text-right">Qtd</TableHead>
+                <TableHead className="text-right">Saldo após</TableHead>
+                <TableHead>Por</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {movementsData.data.map((mov) => {
+                const isEntry = mov.type.startsWith('ENTRY_');
+                return (
+                  <TableRow key={mov.id}>
+                    <TableCell className="text-xs text-slate-500">
+                      {new Date(mov.createdAt).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })}
+                    </TableCell>
+                    <TableCell>
+                      <Badge
+                        className={
+                          isEntry
+                            ? 'bg-green-50 text-green-700 border-0 text-xs'
+                            : 'bg-red-50 text-red-700 border-0 text-xs'
+                        }
+                      >
+                        {isEntry ? <TrendingUp size={10} className="mr-1" /> : <TrendingDown size={10} className="mr-1" />}
+                        {MOVEMENT_TYPE_LABELS[mov.type as keyof typeof MOVEMENT_TYPE_LABELS] ?? mov.type}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-mono text-xs">{mov.lot?.lotNumber ?? '—'}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      <span className={isEntry ? 'text-green-700' : 'text-red-700'}>
+                        {isEntry ? '+' : '-'}{mov.quantity}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right text-slate-600">{mov.balanceAfter}</TableCell>
+                    <TableCell className="text-xs text-slate-500">{mov.createdBy?.name ?? '—'}</TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        )}
       </div>
 
       <NewLotDialog
         open={newLotOpen}
         onClose={() => setNewLotOpen(false)}
         itemId={id}
+      />
+
+      <EntryPurchaseDialog
+        open={entryOpen}
+        onClose={() => setEntryOpen(false)}
+        itemId={id}
+        itemDescription={item.description}
       />
     </div>
   );

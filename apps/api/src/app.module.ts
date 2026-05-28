@@ -10,6 +10,10 @@ import { UnitsModule } from './modules/units/units.module';
 import { SectorsModule } from './modules/sectors/sectors.module';
 import { ItemsModule } from './modules/items/items.module';
 import { LotsModule } from './modules/lots/lots.module';
+import { MovementsModule } from './modules/movements/movements.module';
+import { AlertsModule } from './modules/alerts/alerts.module';
+import { ExternalPartnersModule } from './modules/external-partners/external-partners.module';
+import { ExchangesModule } from './modules/exchanges/exchanges.module';
 
 @Module({
   imports: [
@@ -22,6 +26,10 @@ import { LotsModule } from './modules/lots/lots.module';
     SectorsModule,
     ItemsModule,
     LotsModule,
+    MovementsModule,
+    AlertsModule,
+    ExternalPartnersModule,
+    ExchangesModule,
   ],
   providers: [
     {

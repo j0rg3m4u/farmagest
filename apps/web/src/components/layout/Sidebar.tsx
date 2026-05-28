@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserRole } from '@farmagest/shared';
 import { useAuthStore } from '@/stores/auth-store';
-import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload, PencilLine } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload, PencilLine, ArrowRightLeft, Globe, Repeat2 } from 'lucide-react';
 
 interface NavItem {
   href: string;
@@ -63,6 +63,24 @@ const NAV_ITEMS: NavItem[] = [
     label: 'Editar em Lote',
     icon: PencilLine,
     roles: [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER],
+  },
+  {
+    href: '/movimentacoes',
+    label: 'Movimentações',
+    icon: ArrowRightLeft,
+    roles: [UserRole.COORDINATION, UserRole.MANAGER, UserRole.ADMIN],
+  },
+  {
+    href: '/trocas',
+    label: 'Trocas Inter-Municipais',
+    icon: Repeat2,
+    roles: [UserRole.COORDINATION, UserRole.MANAGER],
+  },
+  {
+    href: '/parceiros',
+    label: 'Municípios Parceiros',
+    icon: Globe,
+    roles: [UserRole.COORDINATION, UserRole.MANAGER],
   },
   {
     href: '/pedidos',

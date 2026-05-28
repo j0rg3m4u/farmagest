@@ -5,3 +5,5 @@ export * from './lot';
 export * from './user';
 export * from './unit';
 export * from './auth';
+export * from './movement';
+export * from './exchange';

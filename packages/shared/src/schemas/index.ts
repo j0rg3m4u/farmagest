@@ -4,3 +4,6 @@ export * from './item.schema';
 export * from './lot.schema';
 export * from './user.schema';
 export * from './unit.schema';
+export * from './movement.schema';
+export * from './external-partner.schema';
+export * from './exchange.schema';

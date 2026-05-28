@@ -11,6 +11,11 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Iniciando seed...');
 
+  await prisma.exchangeOutput.deleteMany();
+  await prisma.exchangeInput.deleteMany();
+  await prisma.exchange.deleteMany();
+  await prisma.externalPartner.deleteMany();
+  await prisma.movement.deleteMany();
   await prisma.lot.deleteMany();
   await prisma.item.deleteMany();
   await prisma.refreshToken.deleteMany();
@@ -18,6 +23,7 @@ async function main() {
   await prisma.user.deleteMany();
   await prisma.unit.deleteMany();
   await prisma.sector.deleteMany();
+  await prisma.setting.deleteMany();
 
   // ============ SETORES ============
   const [setorMed, setorCorr] = await Promise.all([
@@ -311,6 +317,33 @@ async function main() {
   });
 
   console.log('✓ 3 lotes criados');
+
+  // ============ SETTING SINGLETON ============
+  await prisma.setting.upsert({
+    where: { id: 'singleton' },
+    update: {},
+    create: {
+      id: 'singleton',
+      requireExchangeApproval: false,
+      exchangeTolerancePct: 5,
+      exchangeApprovalThreshold: 0,
+      exchangeSequence: 0,
+    },
+  });
+
+  console.log('✓ Setting singleton criado');
+
+  // ============ MUNICÍPIOS PARCEIROS ============
+  await prisma.externalPartner.createMany({
+    data: [
+      { name: 'Belford Roxo', responsibleName: 'A definir', notes: 'Município parceiro frequente de Duque de Caxias' },
+      { name: 'São João de Meriti', responsibleName: 'A definir' },
+      { name: 'Niterói', responsibleName: 'A definir' },
+      { name: 'Magé', responsibleName: 'A definir' },
+    ],
+  });
+
+  console.log('✓ 4 municípios parceiros criados');
 
   // ============ VALIDAÇÃO DE CONSISTÊNCIA ============
   const inconsistent = await prisma.user.findMany({
