@@ -33,7 +33,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UsuariosPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canManageUsers = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
+  const canManageUsers = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
 
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');

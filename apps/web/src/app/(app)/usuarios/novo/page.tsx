@@ -48,10 +48,8 @@ export default function NovoUsuarioPage() {
     }
   }
 
-  const needsUnit = selectedRole === UserRole.UNIT;
-  const needsSector = [UserRole.COORDINATION, UserRole.ADMIN, UserRole.ASSISTANT].includes(
-    selectedRole as UserRole,
-  );
+  const needsUnit = selectedRole === 'UNIT';
+  const needsSector = ['COORDINATION', 'ADMIN', 'ASSISTANT'].includes(selectedRole as string);
 
   return (
     <div className="p-6 max-w-2xl">

@@ -25,7 +25,7 @@ export default function UnidadePage({ params }: { params: Promise<{ id: string }
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canManageUnits = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
+  const canManageUnits = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
 
   const { data: unit, isLoading } = useUnit(id);
   const updateUnit = useUpdateUnit(id);

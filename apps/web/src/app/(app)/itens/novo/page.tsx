@@ -30,7 +30,7 @@ import { ArrowLeft, Info } from 'lucide-react';
 export default function NovoItemPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === UserRole.MANAGER;
+  const isManager = user?.role === 'MANAGER';
   const createItem = useCreateItem();
   const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 

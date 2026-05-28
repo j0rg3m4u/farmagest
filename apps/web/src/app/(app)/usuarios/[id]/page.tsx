@@ -27,7 +27,7 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
   const { id } = use(params);
   const router = useRouter();
   const currentUser = useAuthStore((s) => s.user);
-  const canManageUsers = currentUser?.role === UserRole.COORDINATION || currentUser?.role === UserRole.MANAGER;
+  const canManageUsers = currentUser?.role === 'COORDINATION' || currentUser?.role === 'MANAGER';
 
   const { data: profile, isLoading } = useUser(id);
   const updateUser = useUpdateUser(id);

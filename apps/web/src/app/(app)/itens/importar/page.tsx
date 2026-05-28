@@ -109,7 +109,7 @@ function validateListRow(row: Record<string, unknown>, num: number): ListPreview
 export default function ImportarItensPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === UserRole.MANAGER;
+  const isManager = user?.role === 'MANAGER';
   const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 
   const [mode, setMode] = useState<ImportMode>('list');

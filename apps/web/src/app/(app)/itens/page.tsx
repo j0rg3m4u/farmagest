@@ -32,11 +32,9 @@ import { Plus, Pencil, Trash2, AlertTriangle, Eraser } from 'lucide-react';
 export default function ItensPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === UserRole.MANAGER;
-  const canCreate = [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER].includes(
-    user?.role as UserRole,
-  );
-  const canDelete = [UserRole.COORDINATION, UserRole.MANAGER].includes(user?.role as UserRole);
+  const isManager = user?.role === 'MANAGER';
+  const canCreate = ['COORDINATION', 'ADMIN', 'MANAGER'].includes(user?.role as string);
+  const canDelete = ['COORDINATION', 'MANAGER'].includes(user?.role as string);
 
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');

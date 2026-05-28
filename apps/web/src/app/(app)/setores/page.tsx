@@ -25,7 +25,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function SetoresPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
+  const canEdit = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
 
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);

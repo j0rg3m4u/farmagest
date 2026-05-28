@@ -50,9 +50,7 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = [UserRole.COORDINATION, UserRole.ADMIN, UserRole.MANAGER].includes(
-    user?.role as UserRole,
-  );
+  const canEdit = ['COORDINATION', 'ADMIN', 'MANAGER'].includes(user?.role as string);
   const canAddLot = canEdit;
   const [newLotOpen, setNewLotOpen] = useState(false);
 

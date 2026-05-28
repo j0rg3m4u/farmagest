@@ -32,7 +32,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UnidadesPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canManageUnits = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
+  const canManageUnits = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
 
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');

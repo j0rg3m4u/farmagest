@@ -18,7 +18,7 @@ export default function SetorPage({ params }: { params: Promise<{ id: string }> 
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = user?.role === UserRole.COORDINATION || user?.role === UserRole.MANAGER;
+  const canEdit = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
 
   const { data: sector, isLoading } = useSector(id);
   const updateSector = useUpdateSector(id);
