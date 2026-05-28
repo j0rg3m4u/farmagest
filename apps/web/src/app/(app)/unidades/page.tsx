@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useUnits, useDeleteUnit } from '@/hooks/use-units';
 import { useAuthStore } from '@/stores/auth-store';
-import { UNIT_TYPE_LABELS, UnitType, UserRole } from '@farmagest/shared';
+import { UNIT_TYPE_LABELS, UnitType } from '@farmagest/shared';
+import { canManageUnits } from '@/lib/permissions';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -32,7 +33,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UnidadesPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canManageUnits = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+  const canManage = canManageUnits(user);
 
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
@@ -59,7 +60,7 @@ export default function UnidadesPage() {
         title="Unidades de Saúde"
         description={`${data?.total ?? 0} unidades cadastradas`}
         action={
-          canManageUnits && (
+          canManage && (
             <Link href="/unidades/novo">
               <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
                 <Plus size={16} /> Nova Unidade
@@ -100,7 +101,7 @@ export default function UnidadesPage() {
               <TableHead>Responsável</TableHead>
               <TableHead>Contato</TableHead>
               <TableHead>Status</TableHead>
-              {canManageUnits && <TableHead className="w-20" />}
+              {canManage && <TableHead className="w-20" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -135,7 +136,7 @@ export default function UnidadesPage() {
                     {unit.active ? 'Ativa' : 'Inativa'}
                   </Badge>
                 </TableCell>
-                {canManageUnits && (
+                {canManage && (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-1">
                       <Button

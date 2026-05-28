@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useSectors, useDeleteSector } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
-import { UserRole } from '@farmagest/shared';
+import { canManageSectors } from '@/lib/permissions';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -25,7 +25,7 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function SetoresPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+  const canEdit = canManageSectors(user);
 
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);

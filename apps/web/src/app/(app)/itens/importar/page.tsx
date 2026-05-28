@@ -3,7 +3,8 @@ import { useCallback, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as XLSX from 'xlsx';
 import { toast } from 'sonner';
-import { ITEM_CATEGORY_LABELS, ItemCategory, UserRole } from '@farmagest/shared';
+import { ITEM_CATEGORY_LABELS, ItemCategory } from '@farmagest/shared';
+import { hasGlobalView } from '@/lib/permissions';
 import { useSectors } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
 import { apiClient } from '@/lib/api-client';
@@ -109,7 +110,7 @@ function validateListRow(row: Record<string, unknown>, num: number): ListPreview
 export default function ImportarItensPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === 'MANAGER';
+  const isManager = hasGlobalView(user);
   const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 
   const [mode, setMode] = useState<ImportMode>('list');

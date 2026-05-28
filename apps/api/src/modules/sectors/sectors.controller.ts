@@ -40,13 +40,13 @@ export class SectorsController {
   }
 
   @Post()
-  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
+  @Roles(UserRole.MANAGER)
   create(@Body(new ZodValidationPipe(createSectorSchema)) dto: CreateSectorInput) {
     return this.sectors.create(dto);
   }
 
   @Patch(':id')
-  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
+  @Roles(UserRole.MANAGER)
   update(
     @Param('id') id: string,
     @Body(new ZodValidationPipe(updateSectorSchema)) dto: UpdateSectorInput,
@@ -55,7 +55,7 @@ export class SectorsController {
   }
 
   @Delete(':id')
-  @Roles(UserRole.COORDINATION, UserRole.MANAGER)
+  @Roles(UserRole.MANAGER)
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.sectors.remove(id);

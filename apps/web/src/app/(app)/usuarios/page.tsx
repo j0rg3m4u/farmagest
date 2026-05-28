@@ -6,7 +6,9 @@ import { toast } from 'sonner';
 import { useUsers, useDeleteUser } from '@/hooks/use-users';
 import { useUnits } from '@/hooks/use-units';
 import { useAuthStore } from '@/stores/auth-store';
-import { USER_ROLE_LABELS, UserRole } from '@farmagest/shared';
+import { USER_ROLE_LABELS } from '@farmagest/shared';
+import { canManageUsers, hasGlobalView } from '@/lib/permissions';
+import { UserRole } from '@farmagest/shared';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -33,7 +35,8 @@ import { Plus, Pencil, Trash2 } from 'lucide-react';
 export default function UsuariosPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canManageUsers = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+  const canManage = canManageUsers(user);
+  const isGlobal = hasGlobalView(user);
 
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
@@ -63,7 +66,7 @@ export default function UsuariosPage() {
         title="Usuários"
         description={`${data?.total ?? 0} usuários cadastrados`}
         action={
-          canManageUsers && (
+          canManage && (
             <Link href="/usuarios/novo">
               <Button size="sm" className="bg-pmdc-blue hover:bg-pmdc-blue-dark text-white gap-1.5">
                 <Plus size={16} /> Novo Usuário
@@ -104,7 +107,7 @@ export default function UsuariosPage() {
               <TableHead>Perfil</TableHead>
               <TableHead>Unidade</TableHead>
               <TableHead>Status</TableHead>
-              {canManageUsers && <TableHead className="w-20" />}
+              {canManage && <TableHead className="w-20" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,7 +144,7 @@ export default function UsuariosPage() {
                     {u.active ? 'Ativo' : 'Inativo'}
                   </Badge>
                 </TableCell>
-                {canManageUsers && (
+                {canManage && (
                   <TableCell onClick={(e) => e.stopPropagation()}>
                     <div className="flex gap-1">
                       <Button

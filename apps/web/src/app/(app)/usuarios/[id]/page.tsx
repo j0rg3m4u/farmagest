@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateUserSchema, USER_ROLE_LABELS, UserRole, type UpdateUserInput } from '@farmagest/shared';
+import { canEditUsers } from '@/lib/permissions';
 import { useUser, useUpdateUser } from '@/hooks/use-users';
 import { useUnits } from '@/hooks/use-units';
 import { useSectors } from '@/hooks/use-sectors';
@@ -27,7 +28,7 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
   const { id } = use(params);
   const router = useRouter();
   const currentUser = useAuthStore((s) => s.user);
-  const canManageUsers = currentUser?.role === 'COORDINATION' || currentUser?.role === 'MANAGER';
+  const canManage = canEditUsers(currentUser);
 
   const { data: profile, isLoading } = useUser(id);
   const updateUser = useUpdateUser(id);
@@ -90,17 +91,17 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white rounded-lg border p-6 space-y-5">
         <div className="space-y-1.5">
           <Label>Nome completo</Label>
-          <Input {...register('name')} disabled={!canManageUsers} />
+          <Input {...register('name')} disabled={!canManage} />
           {errors.name && <p className="text-xs text-red-600">{errors.name.message}</p>}
         </div>
 
         <div className="space-y-1.5">
           <Label>E-mail</Label>
-          <Input type="email" {...register('email')} disabled={!canManageUsers} />
+          <Input type="email" {...register('email')} disabled={!canManage} />
           {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
         </div>
 
-        {canManageUsers && (
+        {canManage && (
           <>
             <div className="space-y-1.5">
               <Label>Perfil</Label>
@@ -173,7 +174,7 @@ export default function UsuarioPage({ params }: { params: Promise<{ id: string }
           </>
         )}
 
-        {canManageUsers && (
+        {canManage && (
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => router.back()}>
               Cancelar

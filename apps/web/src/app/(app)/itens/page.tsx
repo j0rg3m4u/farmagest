@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useItems, useDeleteItem, useResetItems } from '@/hooks/use-items';
 import { useAuthStore } from '@/stores/auth-store';
-import { ITEM_CATEGORY_LABELS, ItemCategory, UserRole } from '@farmagest/shared';
+import { ITEM_CATEGORY_LABELS, ItemCategory } from '@farmagest/shared';
+import { canCreateItems, canDeleteItems, hasGlobalView } from '@/lib/permissions';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
@@ -32,9 +33,9 @@ import { Plus, Pencil, Trash2, AlertTriangle, Eraser } from 'lucide-react';
 export default function ItensPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === 'MANAGER';
-  const canCreate = ['COORDINATION', 'ADMIN', 'MANAGER'].includes(user?.role as string);
-  const canDelete = ['COORDINATION', 'MANAGER'].includes(user?.role as string);
+  const isGlobal = hasGlobalView(user);
+  const canCreate = canCreateItems(user);
+  const canDelete = canDeleteItems(user);
 
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -80,7 +81,7 @@ export default function ItensPage() {
         description={`${data?.total ?? 0} itens cadastrados`}
         action={
           <div className="flex gap-2">
-            {isManager && (
+            {isGlobal && (
               <Button
                 size="sm"
                 variant="outline"
@@ -140,7 +141,7 @@ export default function ItensPage() {
               <TableHead>Categoria</TableHead>
               <TableHead>Unidade</TableHead>
               <TableHead>Fabricante</TableHead>
-              {isManager && <TableHead>Setor</TableHead>}
+              {isGlobal && <TableHead>Setor</TableHead>}
               <TableHead>Status</TableHead>
               {canDelete && <TableHead className="w-20" />}
             </TableRow>
@@ -188,7 +189,7 @@ export default function ItensPage() {
                 </TableCell>
                 <TableCell className="text-slate-500 text-sm">{item.unitOfMeasure}</TableCell>
                 <TableCell className="text-slate-500">{item.manufacturer ?? '—'}</TableCell>
-                {isManager && (
+                {isGlobal && (
                   <TableCell>
                     <Badge variant="outline" className="font-mono text-xs">
                       {item.sector?.code}

@@ -4,9 +4,10 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { updateSectorSchema, UserRole, type UpdateSectorInput } from '@farmagest/shared';
+import { updateSectorSchema, type UpdateSectorInput } from '@farmagest/shared';
 import { useSector, useUpdateSector } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
+import { canEditSectors } from '@/lib/permissions';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,7 +19,7 @@ export default function SetorPage({ params }: { params: Promise<{ id: string }> 
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+  const canEdit = canEditSectors(user);
 
   const { data: sector, isLoading } = useSector(id);
   const updateSector = useUpdateSector(id);

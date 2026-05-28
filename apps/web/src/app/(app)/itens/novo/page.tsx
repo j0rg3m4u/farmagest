@@ -8,9 +8,9 @@ import {
   createItemSchema,
   ITEM_CATEGORY_LABELS,
   ItemCategory,
-  UserRole,
   type CreateItemInput,
 } from '@farmagest/shared';
+import { hasGlobalView } from '@/lib/permissions';
 import { useCreateItem } from '@/hooks/use-items';
 import { useSectors } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
@@ -30,7 +30,7 @@ import { ArrowLeft, Info } from 'lucide-react';
 export default function NovoItemPage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === 'MANAGER';
+  const isManager = hasGlobalView(user);
   const createItem = useCreateItem();
   const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 

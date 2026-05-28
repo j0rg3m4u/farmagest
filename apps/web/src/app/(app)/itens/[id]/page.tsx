@@ -8,9 +8,9 @@ import {
   updateItemSchema,
   ITEM_CATEGORY_LABELS,
   ItemCategory,
-  UserRole,
   type UpdateItemInput,
 } from '@farmagest/shared';
+import { canEditItems, canCreateLots } from '@/lib/permissions';
 import { useItem, useUpdateItem } from '@/hooks/use-items';
 import { useItemLots } from '@/hooks/use-lots';
 import { useAuthStore } from '@/stores/auth-store';
@@ -50,8 +50,8 @@ export default function ItemPage({ params }: { params: Promise<{ id: string }> }
   const { id } = use(params);
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const canEdit = ['COORDINATION', 'ADMIN', 'MANAGER'].includes(user?.role as string);
-  const canAddLot = canEdit;
+  const canEdit = canEditItems(user);
+  const canAddLot = canCreateLots(user);
   const [newLotOpen, setNewLotOpen] = useState(false);
 
   const { data: item, isLoading } = useItem(id);

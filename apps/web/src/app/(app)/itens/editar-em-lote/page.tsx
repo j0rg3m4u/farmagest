@@ -2,7 +2,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { ITEM_CATEGORY_LABELS, ItemCategory, UserRole } from '@farmagest/shared';
+import { ITEM_CATEGORY_LABELS, ItemCategory } from '@farmagest/shared';
+import { hasGlobalView } from '@/lib/permissions';
 import { useItems, useBatchUpdateItems } from '@/hooks/use-items';
 import { useSectors } from '@/hooks/use-sectors';
 import { useAuthStore } from '@/stores/auth-store';
@@ -41,7 +42,7 @@ interface EditableRow {
 export default function EditarEmLotePage() {
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
-  const isManager = user?.role === 'MANAGER';
+  const isManager = hasGlobalView(user);
   const { data: sectorsData } = useSectors({ active: 'true', limit: 100 });
 
   const [sectorFilter, setSectorFilter] = useState(isManager ? '' : (user?.sectorId ?? ''));
