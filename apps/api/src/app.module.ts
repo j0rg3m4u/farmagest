@@ -14,6 +14,7 @@ import { MovementsModule } from './modules/movements/movements.module';
 import { AlertsModule } from './modules/alerts/alerts.module';
 import { ExternalPartnersModule } from './modules/external-partners/external-partners.module';
 import { ExchangesModule } from './modules/exchanges/exchanges.module';
+import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ExchangesModule } from './modules/exchanges/exchanges.module';
     AlertsModule,
     ExternalPartnersModule,
     ExchangesModule,
+    AuditLogsModule,
   ],
   providers: [
     {

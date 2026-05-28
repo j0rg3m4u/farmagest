@@ -80,6 +80,13 @@ export const canManageExchanges: RoleCheck = (user) =>
 
 export const canApproveExchanges: RoleCheck = (user) => user?.role === 'MANAGER';
 
+// ============ AUDIT ============
+
+export const canViewAudit: RoleCheck = (user) =>
+  user?.role === 'MANAGER' || user?.role === 'COORDINATION';
+
+export const canExportAudit: RoleCheck = (user) => user?.role === 'MANAGER';
+
 // ============ HELPERS GLOBAIS ============
 
 /** Usuário vê todos os setores (sem escopo de setor). */

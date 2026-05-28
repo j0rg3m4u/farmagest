@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserRole } from '@farmagest/shared';
 import { useAuthStore } from '@/stores/auth-store';
-import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload, PencilLine, ArrowRightLeft, Globe, Repeat2 } from 'lucide-react';
+import { LayoutDashboard, Users, Building2, Package, ClipboardList, BarChart3, Layers, Upload, PencilLine, ArrowRightLeft, Globe, Repeat2, ShieldCheck } from 'lucide-react';
 
 interface NavItem {
   href: string;
@@ -92,6 +92,12 @@ const NAV_ITEMS: NavItem[] = [
     href: '/relatorios',
     label: 'Relatórios',
     icon: BarChart3,
+    roles: [UserRole.COORDINATION, UserRole.MANAGER],
+  },
+  {
+    href: '/auditoria',
+    label: 'Auditoria',
+    icon: ShieldCheck,
     roles: [UserRole.COORDINATION, UserRole.MANAGER],
   },
 ];

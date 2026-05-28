@@ -25,6 +25,15 @@ export class AuthService {
 
     const valid = user && (await bcrypt.compare(dto.password, user.passwordHash));
     if (!valid) {
+      await this.prisma.auditLog.create({
+        data: {
+          userId: null,
+          action: 'LOGIN_FAILED',
+          entity: 'Auth',
+          entityId: null,
+          payload: { emailAttempted: dto.email, at: new Date().toISOString() },
+        },
+      }).catch(() => {});
       throw new UnauthorizedException('Credenciais inválidas');
     }
 
@@ -36,6 +45,17 @@ export class AuthService {
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
+
+    await this.prisma.auditLog.create({
+      data: {
+        userId: user.id,
+        sectorId: user.sectorId ?? null,
+        action: 'LOGIN',
+        entity: 'Auth',
+        entityId: user.id,
+        payload: { email: user.email, at: new Date().toISOString() },
+      },
+    }).catch(() => {});
 
     const payload: JwtPayload = {
       sub: user.id,
