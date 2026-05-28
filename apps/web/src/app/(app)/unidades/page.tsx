@@ -29,6 +29,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Pagination } from '@/components/shared/Pagination';
 
 export default function UnidadesPage() {
   const router = useRouter();
@@ -38,8 +39,10 @@ export default function UnidadesPage() {
   const [search, setSearch] = useState('');
   const [type, setType] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
 
-  const { data, isLoading } = useUnits({ search: search || undefined, type: type || undefined });
+  const { data, isLoading } = useUnits({ search: search || undefined, type: type || undefined, page, limit });
   const deleteUnit = useDeleteUnit();
 
   async function handleDelete() {
@@ -75,10 +78,10 @@ export default function UnidadesPage() {
         <Input
           placeholder="Buscar por nome…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="max-w-xs"
         />
-        <Select value={type} onValueChange={(v) => setType(v ?? '')}>
+        <Select value={type} onValueChange={(v) => { setType(v ?? ''); setPage(1); }}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Tipo" />
           </SelectTrigger>
@@ -163,6 +166,17 @@ export default function UnidadesPage() {
           </TableBody>
         </Table>
       </div>
+
+      {data && (
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          total={data.total}
+          limit={data.limit}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteId}

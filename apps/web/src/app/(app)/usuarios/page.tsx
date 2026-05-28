@@ -31,6 +31,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Pagination } from '@/components/shared/Pagination';
 
 export default function UsuariosPage() {
   const router = useRouter();
@@ -41,8 +42,10 @@ export default function UsuariosPage() {
   const [search, setSearch] = useState('');
   const [role, setRole] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
 
-  const { data, isLoading } = useUsers({ search: search || undefined, role: role || undefined });
+  const { data, isLoading } = useUsers({ search: search || undefined, role: role || undefined, page, limit });
   const { data: unitsData } = useUnits({ limit: 100 });
   const deleteUser = useDeleteUser();
 
@@ -81,10 +84,10 @@ export default function UsuariosPage() {
         <Input
           placeholder="Buscar por nome ou e-mail…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="max-w-xs"
         />
-        <Select value={role} onValueChange={(v) => setRole(v ?? '')}>
+        <Select value={role} onValueChange={(v) => { setRole(v ?? ''); setPage(1); }}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Perfil" />
           </SelectTrigger>
@@ -173,6 +176,17 @@ export default function UsuariosPage() {
           </TableBody>
         </Table>
       </div>
+
+      {data && (
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          total={data.total}
+          limit={data.limit}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteId}

@@ -29,6 +29,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, Pencil, Trash2, AlertTriangle, Eraser } from 'lucide-react';
+import { Pagination } from '@/components/shared/Pagination';
 
 export default function ItensPage() {
   const router = useRouter();
@@ -42,11 +43,15 @@ export default function ItensPage() {
   const [controlled344, setControlled344] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
 
   const { data, isLoading } = useItems({
     search: search || undefined,
     category: category || undefined,
     controlled344: controlled344 || undefined,
+    page,
+    limit,
   });
   const deleteItem = useDeleteItem();
   const resetItems = useResetItems();
@@ -106,10 +111,10 @@ export default function ItensPage() {
         <Input
           placeholder="Buscar por código, descrição ou fabricante…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="max-w-xs"
         />
-        <Select value={category} onValueChange={(v) => setCategory(v ?? '')}>
+        <Select value={category} onValueChange={(v) => { setCategory(v ?? ''); setPage(1); }}>
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Categoria" />
           </SelectTrigger>
@@ -120,7 +125,7 @@ export default function ItensPage() {
             ))}
           </SelectContent>
         </Select>
-        <Select value={controlled344} onValueChange={(v) => setControlled344(v ?? '')}>
+        <Select value={controlled344} onValueChange={(v) => { setControlled344(v ?? ''); setPage(1); }}>
           <SelectTrigger className="w-40">
             <SelectValue placeholder="Portaria 344" />
           </SelectTrigger>
@@ -234,6 +239,17 @@ export default function ItensPage() {
           </TableBody>
         </Table>
       </div>
+
+      {data && (
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          total={data.total}
+          limit={data.limit}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteId}
