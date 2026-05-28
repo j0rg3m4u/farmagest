@@ -21,6 +21,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Plus, Pencil, Trash2 } from 'lucide-react';
+import { Pagination } from '@/components/shared/Pagination';
 
 export default function SetoresPage() {
   const router = useRouter();
@@ -29,8 +30,10 @@ export default function SetoresPage() {
 
   const [search, setSearch] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(50);
 
-  const { data, isLoading } = useSectors({ search: search || undefined });
+  const { data, isLoading } = useSectors({ search: search || undefined, page, limit });
   const deleteSector = useDeleteSector();
 
   async function handleDelete() {
@@ -65,7 +68,7 @@ export default function SetoresPage() {
         <Input
           placeholder="Buscar por nome ou código…"
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => { setSearch(e.target.value); setPage(1); }}
           className="max-w-xs"
         />
       </div>
@@ -149,6 +152,17 @@ export default function SetoresPage() {
           </TableBody>
         </Table>
       </div>
+
+      {data && (
+        <Pagination
+          page={data.page}
+          totalPages={data.totalPages}
+          total={data.total}
+          limit={data.limit}
+          onPageChange={setPage}
+          onLimitChange={(l) => { setLimit(l); setPage(1); }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteId}
