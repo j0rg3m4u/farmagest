@@ -119,6 +119,20 @@ async function main() {
   // ============ USUÁRIOS ============
   const passwordHash = await bcrypt.hash('FarmaGest@2026', 10);
 
+  // SUPERADMIN — operador técnico NodeLab
+  const superadminHash = await bcrypt.hash('NodeLab@Super2026!', 10);
+  await prisma.user.upsert({
+    where: { email: 'admin@nodelab.com.br' },
+    update: {},
+    create: {
+      name: 'NodeLab Admin',
+      email: 'admin@nodelab.com.br',
+      passwordHash: superadminHash,
+      role: UserRole.SUPERADMIN,
+      active: true,
+    },
+  });
+
   // Manager — vê todos os setores
   await prisma.user.create({
     data: {
@@ -362,9 +376,18 @@ async function main() {
     process.exit(1);
   }
 
+  // Garantir que SUPERADMIN existe
+  const superAdmin = await prisma.user.findFirst({ where: { role: UserRole.SUPERADMIN } });
+  if (!superAdmin) {
+    console.error('❌ SUPERADMIN não foi criado!');
+    process.exit(1);
+  }
+  console.log('✓ SUPERADMIN:', superAdmin.email);
+
   console.log('');
   console.log('═══════════════════════════════════════════════════════');
   console.log('Logins disponíveis (senha: FarmaGest@2026):');
+  console.log('  admin@nodelab.com.br   → SUPERADMIN (senha: NodeLab@Super2026!)');
   console.log('  marcele.manager@...   → MANAGER (vê todos os setores)');
   console.log('  marylyn@...           → COORDINATION / Medicamentos');
   console.log('  ricardo.coordenacao@... → COORDINATION / Correlatos');

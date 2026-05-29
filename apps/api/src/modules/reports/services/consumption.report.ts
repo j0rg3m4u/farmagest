@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { resolvePeriod, type ReportFilters } from '@farmagest/shared';
 import type { JwtPayload } from '@farmagest/shared';
+import { isGlobalRole } from '../../../common/utils/auth.utils';
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
 const fmtR$ = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -15,7 +16,7 @@ export class ConsumptionReportService {
   async getByItem(filters: ReportFilters, user: JwtPayload) {
     const { from, to } = resolvePeriod(filters);
     const days = Math.max(1, Math.round((to.getTime() - from.getTime()) / 864e5));
-    const sectorId = user.role !== 'MANAGER' ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
+    const sectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
 
     const grouped = await this.prisma.movement.groupBy({
       by: ['itemId'],
@@ -78,7 +79,7 @@ export class ConsumptionReportService {
 
   async getByUnit(filters: ReportFilters, user: JwtPayload) {
     const { from, to } = resolvePeriod(filters);
-    const sectorId = user.role !== 'MANAGER' ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
+    const sectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
 
     const grouped = await this.prisma.movement.groupBy({
       by: ['unitId'],

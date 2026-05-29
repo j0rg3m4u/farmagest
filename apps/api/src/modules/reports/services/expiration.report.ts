@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import type { JwtPayload } from '@farmagest/shared';
+import { isGlobalRole } from '../../../common/utils/auth.utils';
 
 const fmtNum = (n: number) => n.toLocaleString('pt-BR', { maximumFractionDigits: 3 });
 const fmtR$ = (n: number) => n.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -16,7 +17,7 @@ export class ExpirationReportService {
   constructor(private prisma: PrismaService) {}
 
   async getData(days: number = 30, user: JwtPayload, sectorId?: string) {
-    const scopedSectorId = user.role !== 'MANAGER' ? (user.sectorId ?? undefined) : (sectorId ?? undefined);
+    const scopedSectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (sectorId ?? undefined);
     const maxDays = Math.min(90, Math.max(1, days));
 
     const lots = await this.prisma.lot.findMany({

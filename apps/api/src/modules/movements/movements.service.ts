@@ -7,6 +7,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { MovementType, isEntryType } from '@farmagest/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 import type {
   JwtPayload,
   EntryPurchaseInput,
@@ -127,7 +128,7 @@ export class MovementsService {
 
     const where: Prisma.MovementWhereInput = {};
 
-    if (user.role !== 'MANAGER') {
+    if (!isGlobalRole(user)) {
       where.sectorId = user.sectorId ?? undefined;
     } else if (filter.sectorId) {
       where.sectorId = filter.sectorId;

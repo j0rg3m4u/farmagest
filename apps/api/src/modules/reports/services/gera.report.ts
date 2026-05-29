@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { resolvePeriod, type ReportFilters } from '@farmagest/shared';
 import type { JwtPayload } from '@farmagest/shared';
+import { isGlobalRole } from '../../../common/utils/auth.utils';
 
 const fmtDate = (d: Date | string) => new Date(d).toLocaleDateString('pt-BR');
 const fmtPct = (n: number) => `${n.toFixed(1)}%`;
@@ -12,7 +13,7 @@ export class GeraReportService {
 
   async getData(filters: ReportFilters, user: JwtPayload) {
     const { from, to } = resolvePeriod(filters);
-    const sectorId = user.role !== 'MANAGER' ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
+    const sectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
 
     const geras = await this.prisma.gera.findMany({
       where: {

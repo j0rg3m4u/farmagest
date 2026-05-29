@@ -22,6 +22,7 @@ import { ExecutiveReportService } from './services/executive.report';
 import { AuditReportService } from './services/audit.report';
 import { generatePdfReport } from './exporters/pdf.exporter';
 import { generateExcelFromRows } from './exporters/excel.exporter';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 
 function parseFilters(query: Record<string, string>): ReportFilters {
   return reportPeriodSchema.parse({
@@ -276,7 +277,7 @@ export class ReportsController {
   ) {
     const filters = parseFilters(query);
     const days = parseInt(query['days'] ?? '30', 10);
-    const sectorId = user.role !== UserRole.MANAGER ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
+    const sectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
     const data = await this.expiration.getData(days, user, sectorId);
     if (filters.format === 'json') return data;
 
@@ -430,7 +431,7 @@ export class ReportsController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const filters = parseFilters(query);
-    const sectorId = user.role !== UserRole.MANAGER ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
+    const sectorId = !isGlobalRole(user) ? (user.sectorId ?? undefined) : (filters.sectorId ?? undefined);
     const data = await this.stockPosition.getData(user, sectorId);
     if (filters.format === 'json') return data;
 

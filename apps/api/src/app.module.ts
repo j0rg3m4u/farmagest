@@ -17,6 +17,7 @@ import { ExchangesModule } from './modules/exchanges/exchanges.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { GerasModule } from './modules/geras/geras.module';
 import { ReportsModule } from './modules/reports/reports.module';
+import { AdminModule } from './modules/admin/admin.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { ReportsModule } from './modules/reports/reports.module';
     AuditLogsModule,
     GerasModule,
     ReportsModule,
+    AdminModule,
   ],
   providers: [
     {

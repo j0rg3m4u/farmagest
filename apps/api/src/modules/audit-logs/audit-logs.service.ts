@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { createHash } from 'crypto';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 import type { JwtPayload } from '@farmagest/shared';
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -29,7 +30,7 @@ export class AuditLogsService {
   private buildWhere(filters: AuditLogFilters, user: JwtPayload): Prisma.AuditLogWhereInput {
     const where: Prisma.AuditLogWhereInput = {};
 
-    if (user.role !== 'MANAGER') {
+    if (!isGlobalRole(user)) {
       where.sectorId = user.sectorId ?? undefined;
     } else if (filters.sectorId) {
       where.sectorId = filters.sectorId;

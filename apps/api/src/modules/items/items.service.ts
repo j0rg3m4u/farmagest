@@ -10,6 +10,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { ItemCategory } from '@prisma/client';
 import type { CreateItemInput, UpdateItemInput, JwtPayload } from '@farmagest/shared';
 import { inferUnitOfMeasure } from './utils/infer-unit-of-measure';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 
 const ITEM_SELECT = {
   id: true,
@@ -58,7 +59,7 @@ export class ItemsService {
     if (filter.controlled344 !== undefined) where.controlled344 = filter.controlled344 === 'true';
     if (filter.active !== undefined) where.active = filter.active === 'true';
 
-    if (user.role !== 'MANAGER') {
+    if (!isGlobalRole(user)) {
       where.sectorId = user.sectorId;
     } else if (filter.sectorId) {
       where.sectorId = filter.sectorId;
@@ -85,7 +86,7 @@ export class ItemsService {
     });
     if (!item) throw new NotFoundException('Item não encontrado');
 
-    if (user.role !== 'MANAGER' && item.sectorId !== user.sectorId) {
+    if (!isGlobalRole(user) && item.sectorId !== user.sectorId) {
       throw new ForbiddenException('Item pertence a outro setor');
     }
 
@@ -121,7 +122,7 @@ export class ItemsService {
   async update(id: string, dto: UpdateItemInput, user: JwtPayload) {
     const item = await this.findOne(id, user);
 
-    if (user.role !== 'MANAGER' && user.role !== 'COORDINATION') {
+    if (!isGlobalRole(user) && user.role !== 'COORDINATION') {
       if (user.role === 'ADMIN' && item.sectorId !== user.sectorId) {
         throw new ForbiddenException('Sem permissão para editar este item');
       }
@@ -158,7 +159,7 @@ export class ItemsService {
       for (const { id, category, unitOfMeasure, manufacturer, controlled344, active, description } of updates) {
         const item = await tx.item.findFirst({ where: { id, deletedAt: null }, select: { sectorId: true } });
         if (!item) continue;
-        if (user.role !== 'MANAGER' && item.sectorId !== user.sectorId) continue;
+        if (!isGlobalRole(user) && item.sectorId !== user.sectorId) continue;
         const data: Record<string, unknown> = {};
         if (description !== undefined) data.description = description;
         if (category !== undefined) data.category = category as ItemCategory;

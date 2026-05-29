@@ -8,11 +8,12 @@ datasource db {
 }
 
 enum UserRole {
+  SUPERADMIN
+  MANAGER
   COORDINATION
   ADMIN
   ASSISTANT
   UNIT
-  MANAGER
 }
 
 enum UnitType {

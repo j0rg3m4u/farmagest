@@ -8,6 +8,7 @@ import { Prisma } from '@prisma/client';
 import { GeraStatus, GeraItemStatus } from '@farmagest/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { MovementsService } from '../movements/movements.service';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 import type {
   JwtPayload,
   CreateGeraInput,
@@ -316,7 +317,7 @@ export class GerasService {
     if (!gera) throw new NotFoundException('GERA não encontrado');
 
     const where: Prisma.GeraItemWhereInput = { geraId };
-    if (user.role !== 'MANAGER') {
+    if (!isGlobalRole(user)) {
       where.sectorId = user.sectorId ?? undefined;
     }
 
@@ -422,7 +423,7 @@ export class GerasService {
       });
       if (!geraItem) throw new NotFoundException('Item do GERA não encontrado');
 
-      if (user.role !== 'MANAGER' && geraItem.sectorId !== user.sectorId) {
+      if (!isGlobalRole(user) && geraItem.sectorId !== user.sectorId) {
         throw new ForbiddenException('Item pertence a outro setor');
       }
 
@@ -486,7 +487,7 @@ export class GerasService {
       status: GeraItemStatus.APPROVED,
       movementId: null,
     };
-    if (user.role !== 'MANAGER') where.sectorId = user.sectorId ?? undefined;
+    if (!isGlobalRole(user)) where.sectorId = user.sectorId ?? undefined;
 
     const approvedItems = await this.prisma.geraItem.findMany({
       where,
@@ -546,7 +547,7 @@ export class GerasService {
         geraId,
         status: GeraItemStatus.APPROVED,
         movementId: null,
-        ...(user.role !== 'MANAGER' ? { sectorId: user.sectorId ?? undefined } : {}),
+        ...(!isGlobalRole(user) ? { sectorId: user.sectorId ?? undefined } : {}),
       },
       select: { id: true, itemId: true, approved: true },
     });

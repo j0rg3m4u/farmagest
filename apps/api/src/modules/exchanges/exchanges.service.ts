@@ -8,6 +8,7 @@ import {
 import { Prisma } from '@prisma/client';
 import { ExchangeStatus } from '@farmagest/shared';
 import { PrismaService } from '../../common/prisma/prisma.service';
+import { isGlobalRole } from '../../common/utils/auth.utils';
 import type {
   JwtPayload,
   CreateExchangeInput,
@@ -222,7 +223,7 @@ export class ExchangesService {
 
     const where: Prisma.ExchangeWhereInput = { deletedAt: null };
 
-    if (user.role !== 'MANAGER') where.sectorId = user.sectorId ?? undefined;
+    if (!isGlobalRole(user)) where.sectorId = user.sectorId ?? undefined;
     else if (filter.sectorId) where.sectorId = filter.sectorId;
 
     if (filter.status) where.status = filter.status as ExchangeStatus;
@@ -521,7 +522,7 @@ export class ExchangesService {
   }
 
   async approve(exchangeId: string, user: JwtPayload) {
-    if (user.role !== 'MANAGER') throw new ForbiddenException('Somente MANAGER pode aprovar trocas');
+    if (!isGlobalRole(user)) throw new ForbiddenException('Somente MANAGER pode aprovar trocas');
     const exchange = await this.findOne(exchangeId);
     if (exchange.status !== ExchangeStatus.PENDING) {
       throw new BadRequestException('Troca não está pendente de aprovação');
@@ -534,7 +535,7 @@ export class ExchangesService {
   }
 
   async reject(exchangeId: string, reason: string, user: JwtPayload) {
-    if (user.role !== 'MANAGER') throw new ForbiddenException('Somente MANAGER pode rejeitar trocas');
+    if (!isGlobalRole(user)) throw new ForbiddenException('Somente MANAGER pode rejeitar trocas');
     const exchange = await this.findOne(exchangeId);
     if (exchange.status !== ExchangeStatus.PENDING) {
       throw new BadRequestException('Troca não está pendente de aprovação');
