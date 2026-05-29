@@ -59,7 +59,7 @@ export default function NovaTrocaPage() {
         <div className="space-y-2">
           <Label htmlFor="sectorId">Setor</Label>
           {isCoord ? (
-            <Input id="sectorId" value={user?.sectorId ?? ''} disabled />
+            <Input id="sectorId" value={user?.sector?.name ?? 'Sem setor'} disabled />
           ) : (
             <select
               id="sectorId"
