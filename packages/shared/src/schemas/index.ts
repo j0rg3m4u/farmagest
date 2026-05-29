@@ -7,3 +7,4 @@ export * from './unit.schema';
 export * from './movement.schema';
 export * from './external-partner.schema';
 export * from './exchange.schema';
+export * from './gera.schema';

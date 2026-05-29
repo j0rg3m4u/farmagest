@@ -15,6 +15,7 @@ import { AlertsModule } from './modules/alerts/alerts.module';
 import { ExternalPartnersModule } from './modules/external-partners/external-partners.module';
 import { ExchangesModule } from './modules/exchanges/exchanges.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
+import { GerasModule } from './modules/geras/geras.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
     ExternalPartnersModule,
     ExchangesModule,
     AuditLogsModule,
+    GerasModule,
   ],
   providers: [
     {
