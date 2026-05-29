@@ -265,7 +265,11 @@ export class ExchangesService {
 
   async create(dto: CreateExchangeInput, user: JwtPayload) {
     return this.prisma.$transaction(async (tx) => {
-      const setting = await tx.setting.findUniqueOrThrow({ where: { id: 'singleton' } });
+      const setting = await tx.setting.upsert({
+        where: { id: 'singleton' },
+        create: { id: 'singleton', requireExchangeApproval: false, exchangeTolerancePct: 5, exchangeApprovalThreshold: 0, exchangeSequence: 0, geraSequence: 0 },
+        update: {},
+      });
       const newSeq = setting.exchangeSequence + 1;
       const code = `TRC-${String(newSeq).padStart(4, '0')}`;
 
@@ -501,7 +505,11 @@ export class ExchangesService {
         );
       }
 
-      const setting = await tx.setting.findUniqueOrThrow({ where: { id: 'singleton' } });
+      const setting = await tx.setting.upsert({
+        where: { id: 'singleton' },
+        create: { id: 'singleton', requireExchangeApproval: false, exchangeTolerancePct: 5, exchangeApprovalThreshold: 0, exchangeSequence: 0, geraSequence: 0 },
+        update: {},
+      });
       if (setting.requireExchangeApproval) {
         const threshold = Number(setting.exchangeApprovalThreshold);
         if (balance.totalOutput >= threshold) {

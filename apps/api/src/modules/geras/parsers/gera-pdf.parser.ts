@@ -1,5 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const pdfParse: (buffer: Buffer) => Promise<{ text: string }> = require('pdf-parse');
+const _pdfParseMod = require('pdf-parse');
+// pdf-parse v2 is an ES module with CJS shim — the function lives at .default
+const pdfParse: (buffer: Buffer) => Promise<{ text: string }> =
+  typeof _pdfParseMod === 'function' ? _pdfParseMod : _pdfParseMod.default;
 
 export interface GeraHeaderParsed {
   externalNumber: string | null;

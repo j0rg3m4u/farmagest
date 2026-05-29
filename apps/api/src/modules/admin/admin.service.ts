@@ -18,7 +18,11 @@ export class AdminService {
   // ─── Settings ────────────────────────────────────────────────────────────────
 
   async getSettings() {
-    return this.prisma.setting.findUniqueOrThrow({ where: { id: 'singleton' } });
+    return this.prisma.setting.upsert({
+      where: { id: 'singleton' },
+      create: { id: 'singleton', requireExchangeApproval: false, exchangeTolerancePct: 5, exchangeApprovalThreshold: 0, exchangeSequence: 0, geraSequence: 0 },
+      update: {},
+    });
   }
 
   async updateSettings(dto: {
