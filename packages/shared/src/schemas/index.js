@@ -23,3 +23,4 @@ __exportStar(require("./unit.schema"), exports);
 __exportStar(require("./movement.schema"), exports);
 __exportStar(require("./external-partner.schema"), exports);
 __exportStar(require("./exchange.schema"), exports);
+__exportStar(require("./gera.schema"), exports);

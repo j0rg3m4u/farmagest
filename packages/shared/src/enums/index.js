@@ -20,3 +20,4 @@ __exportStar(require("./movement-type"), exports);
 __exportStar(require("./item-category"), exports);
 __exportStar(require("./unit-type"), exports);
 __exportStar(require("./exchange-status"), exports);
+__exportStar(require("./gera-status"), exports);

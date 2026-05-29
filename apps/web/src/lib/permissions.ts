@@ -80,6 +80,18 @@ export const canManageExchanges: RoleCheck = (user) =>
 
 export const canApproveExchanges: RoleCheck = (user) => user?.role === 'MANAGER';
 
+// ============ GERA ============
+
+export const canManageGeras: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'MANAGER' || user?.role === 'ASSISTANT';
+
+export const canTriageGeras: RoleCheck = (user) =>
+  user?.role === 'COORDINATION' || user?.role === 'MANAGER';
+
+export const canDispatchGeras: RoleCheck = canTriageGeras;
+
+export const canImportGeras: RoleCheck = canManageGeras;
+
 // ============ AUDIT ============
 
 export const canViewAudit: RoleCheck = (user) =>

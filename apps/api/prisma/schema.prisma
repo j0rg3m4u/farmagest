@@ -50,6 +50,26 @@ enum ExchangeStatus {
   CANCELLED
 }
 
+enum GeraStatus {
+  RECEIVED
+  TRIAGING
+  COMPLETED
+  DISPATCHED
+  CANCELLED
+}
+
+enum GeraItemStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+enum GeraType {
+  MONTHLY
+  EXTRAORDINARY
+  URGENT
+}
+
 model Sector {
   id           String    @id @default(cuid())
   name         String    @unique
@@ -66,6 +86,7 @@ model Sector {
   items     Item[]
   exchanges Exchange[]
   movements Movement[]
+  geraItems GeraItem[]
 
   @@index([name])
   @@index([active])
@@ -92,6 +113,8 @@ model User {
   exchangesCreated  Exchange[] @relation("ExchangeCreatedBy")
   exchangesApproved Exchange[] @relation("ExchangeApprovedBy")
   movements         Movement[]
+  gerasRegistered   Gera[]     @relation("GeraRegisteredBy")
+  geraItemsTriaged  GeraItem[] @relation("GeraItemTriagedBy")
 
   @@index([email])
   @@index([unitId])
@@ -125,6 +148,7 @@ model Unit {
 
   users     User[]
   movements Movement[]
+  geras     Gera[]
 
   @@index([name])
 }
@@ -150,6 +174,8 @@ model Item {
   exchangeOutputs ExchangeOutput[]
   exchangeInputs  ExchangeInput[]
   movements       Movement[]
+  geraItems       GeraItem[]
+  externalMappings ExternalCodeMapping[]
 
   @@unique([sectorId, sequence])
   @@index([code])
@@ -180,6 +206,7 @@ model Lot {
   exchangeOutputs ExchangeOutput[]
   exchangeInputs  ExchangeInput[]
   movements       Movement[]
+  geraItems       GeraItem[]
 
   @@unique([itemId, lotNumber])
   @@index([itemId])
@@ -228,6 +255,7 @@ model Movement {
   createdById       String
   createdBy         User         @relation(fields: [createdById], references: [id])
   createdAt         DateTime     @default(now())
+  geraItems         GeraItem[]
 
   @@index([itemId])
   @@index([lotId])
@@ -342,6 +370,90 @@ model Setting {
   exchangeTolerancePct      Decimal  @db.Decimal(5, 2) @default(5.00)
   exchangeApprovalThreshold Decimal  @db.Decimal(14, 2) @default(0)
   exchangeSequence          Int      @default(0)
+  geraSequence              Int      @default(0)
   updatedAt                 DateTime @updatedAt
   updatedById               String?
+}
+
+model Gera {
+  id               String     @id @default(cuid())
+  code             String     @unique
+  externalNumber   String?
+  status           GeraStatus @default(RECEIVED)
+  type             GeraType   @default(MONTHLY)
+
+  unitId           String
+  unit             Unit       @relation(fields: [unitId], references: [id])
+
+  requestedAt      DateTime
+  expectedDelivery DateTime?
+  deadline         DateTime?
+
+  importedFrom     String?
+  importedFileUrl  String?
+
+  registeredById   String
+  registeredBy     User       @relation("GeraRegisteredBy", fields: [registeredById], references: [id])
+
+  items            GeraItem[]
+
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  deletedAt        DateTime?
+
+  @@index([unitId])
+  @@index([status])
+  @@index([requestedAt])
+  @@index([externalNumber])
+}
+
+model GeraItem {
+  id              String         @id @default(cuid())
+  geraId          String
+  gera            Gera           @relation(fields: [geraId], references: [id], onDelete: Cascade)
+
+  externalCode    String?
+  description     String
+
+  itemId          String?
+  item            Item?          @relation(fields: [itemId], references: [id])
+
+  sectorId        String?
+  sector          Sector?        @relation(fields: [sectorId], references: [id])
+
+  declaredBalance Decimal?       @db.Decimal(12, 3)
+  consumption     Decimal?       @db.Decimal(12, 3)
+  requested       Decimal        @db.Decimal(12, 3)
+
+  status          GeraItemStatus @default(PENDING)
+  approved        Decimal?       @db.Decimal(12, 3)
+  denialReason    String?
+  triagedById     String?
+  triagedBy       User?          @relation("GeraItemTriagedBy", fields: [triagedById], references: [id])
+  triagedAt       DateTime?
+
+  movementId      String?
+  movement        Movement?      @relation(fields: [movementId], references: [id])
+  lotId           String?
+  lot             Lot?           @relation(fields: [lotId], references: [id])
+
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([geraId])
+  @@index([itemId])
+  @@index([sectorId])
+  @@index([status])
+}
+
+model ExternalCodeMapping {
+  id            String    @id @default(cuid())
+  externalCode  String    @unique
+  itemId        String
+  item          Item      @relation(fields: [itemId], references: [id])
+  confirmedById String?
+  confirmedAt   DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([itemId])
 }
