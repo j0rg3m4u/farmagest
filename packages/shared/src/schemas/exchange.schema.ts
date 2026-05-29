@@ -1,9 +1,13 @@
 import { z } from 'zod';
 
+const isoDate = z.string()
+  .transform((v) => (/^\d{4}-\d{2}-\d{2}$/.test(v) ? v + 'T00:00:00.000Z' : v))
+  .pipe(z.string().datetime({ message: 'Data inválida' }));
+
 export const createExchangeSchema = z.object({
   partnerId: z.string().cuid('Município parceiro inválido'),
   sectorId: z.string().cuid('Setor inválido'),
-  date: z.string().datetime().optional(),
+  date: isoDate.optional(),
   justification: z.string().min(10, 'Descreva o motivo da troca (mín. 10 caracteres)').max(500),
 });
 
@@ -22,7 +26,7 @@ export const addExchangeOutputSchema = z.object({
 export const addExchangeInputSchema = z.object({
   itemId: z.string().cuid(),
   declaredLotNumber: z.string().max(50).nullable().optional(),
-  declaredExpiration: z.string().datetime().nullable().optional(),
+  declaredExpiration: isoDate.nullable().optional(),
   quantity: z.number().positive(),
   unitValue: z.number().positive('Informe o valor unitário declarado'),
   notes: z.string().max(300).nullable().optional(),
