@@ -8,3 +8,4 @@ export * from './movement.schema';
 export * from './external-partner.schema';
 export * from './exchange.schema';
 export * from './gera.schema';
+export * from './report-filters.schema';

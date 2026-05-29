@@ -16,6 +16,7 @@ import { ExternalPartnersModule } from './modules/external-partners/external-par
 import { ExchangesModule } from './modules/exchanges/exchanges.module';
 import { AuditLogsModule } from './modules/audit-logs/audit-logs.module';
 import { GerasModule } from './modules/geras/geras.module';
+import { ReportsModule } from './modules/reports/reports.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { GerasModule } from './modules/geras/geras.module';
     ExchangesModule,
     AuditLogsModule,
     GerasModule,
+    ReportsModule,
   ],
   providers: [
     {
